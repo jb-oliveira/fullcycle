@@ -24,9 +24,7 @@ func main() {
 	}
 
 	slc := []string{"A", "B", "C"}
-	for k, v := range slc {
-		println(k, v)
-	}
+	newFunction(slc...)
 
 	i := 0
 	for i < 10 {
@@ -35,4 +33,10 @@ func main() {
 	}
 
 	// println(val)
+}
+
+func newFunction(slc ...string) {
+	for k, v := range slc {
+		println(k, v)
+	}
 }
