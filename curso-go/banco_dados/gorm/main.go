@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"math/rand/v2"
 	"time"
 
 	"github.com/google/uuid"
@@ -104,13 +102,13 @@ func main() {
 	// 	panic(err)
 	// }
 
-	var produtos []Produto
-	min := 1.0
-	max := 1000.0
-	for i := range 505 {
-		produtos = append(produtos, Produto{Name: fmt.Sprintf("Produto: %d", i), Price: min + rand.Float64()*(max-min)})
-	}
-	gorm.G[Produto](db).CreateInBatches(ctx, &produtos, 100)
+	// var produtos []Produto
+	// min := 1.0
+	// max := 1000.0
+	// for i := range 505 {
+	// 	produtos = append(produtos, Produto{Name: fmt.Sprintf("Produto: %d", i), Price: min + rand.Float64()*(max-min)})
+	// }
+	// gorm.G[Produto](db).CreateInBatches(ctx, &produtos, 100)
 
 	// batchSize := 50
 	// batchCount := 0
@@ -132,9 +130,6 @@ func main() {
 	// 	return nil
 	// })
 	// fmt.Printf("Batch count: %d\n", batchCount)
-	// for _, p := range produtos {
-	// 	fmt.Printf("Produto: %v\n", p)
-	// }
 
 	// Read
 	// product, err := gorm.G[Produto](db).Where("id = ?", "019a88e9-fdd3-7cf1-91d2-b4a2d3f7ca8e").First(ctx) // find product with integer primary key
