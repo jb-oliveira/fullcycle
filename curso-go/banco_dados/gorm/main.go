@@ -3,12 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
 	_ "github.com/lib/pq" // Import the driver, aliased with _ to run its init function
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 type UuidModel struct {
@@ -21,7 +25,8 @@ type UuidModel struct {
 
 type Categoria struct {
 	UuidModel
-	Name string
+	Name     string
+	Produtos []Produto
 }
 
 func (Categoria) TableName() string {
@@ -81,7 +86,12 @@ func main() {
 	connStr := "user=postgres password=password dbname=myapp host=localhost port=5432 sslmode=disable"
 
 	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{
-		//Logger: newLogger,
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				LogLevel: logger.Info, // Must be Info to see all SQLs, including associations
+			},
+		),
 	})
 	if err != nil {
 		panic("failed to connect database")
@@ -90,10 +100,10 @@ func main() {
 	ctx := context.Background()
 
 	// Migrate the schema
-	err = db.AutoMigrate(&Categoria{}, &Produto{}, &SerialNumber{})
-	if err != nil {
-		panic(err)
-	}
+	// err = db.AutoMigrate(&Categoria{}, &Produto{}, &SerialNumber{})
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// prod := criaCategoriaEProduto(db, ctx, "Categoria 1", "Produto 1", 34.87)
 
@@ -102,7 +112,59 @@ func main() {
 	// 	ProdutoID: prod.ID,
 	// })
 
-	testaProduto(db, ctx)
+	//testaProduto(db, ctx)
+
+	// cats, err := gorm.G[Categoria](db).Find(ctx)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// for i := range 10 {
+	// 	produto := Produto{Name: fmt.Sprintf("Produto : %d", i), Price: 100.45, CategoriaID: cats[0].ID}
+	// 	err = gorm.G[Produto](db).Create(ctx, &produto)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
+
+	// categorias, err := gorm.G[Categoria](db).
+	// 	Preload("Produtos", nil).
+	// 	Preload("Produtos.NumeroSerial", nil).
+	// 	Find(ctx)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// for _, cat := range categorias {
+	// 	fmt.Printf("Categoria: %s", cat.Name)
+	// 	for _, p := range cat.Produtos {
+	// 		fmt.Printf("-- Produto = %s, NumeroSerial = %s \n", p.Name, p.NumeroSerial.Number)
+	// 	}
+	// }
+
+	prods, err := gorm.G[Produto](db).
+		Joins(clause.Has("Categoria"), nil).
+		Joins(clause.Has("NumeroSerial"), nil).
+		Find(ctx)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Total produtos %d", len(prods))
+
+	// err = gorm.G[Produto](db).
+	// 	Joins(clause.InnerJoin.Association("Categoria"), nil).
+	// 	Joins(clause.InnerJoin.Association("NumeroSerial"), nil).
+	// 	FindInBatches(ctx, 10000, func(data []Produto, batch int) error {
+	// 		fmt.Printf("Total de produtos: %d", len(data))
+	// 		for _, prod := range data {
+	// 			str := prod.ID.String()
+	// 			if str == "" {
+	// 				return errors.ErrUnsupported
+	// 			}
+	// 		}
+	// 		return nil
+	// 	})
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// produto := Produto{Name: "Teste 5", Price: 1234.78}
 
@@ -199,7 +261,7 @@ func testaProduto(db *gorm.DB, ctx context.Context) {
 		panic(err)
 	}
 	for _, p := range produtos {
-		fmt.Printf("Produto: %v\n", p)
+		fmt.Printf("Categoria: %s\n", p.Name)
 	}
 }
 
