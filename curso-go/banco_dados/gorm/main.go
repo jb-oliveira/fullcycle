@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,8 +20,8 @@ type UuidModel struct {
 }
 
 type Categoria struct {
-	Name string
 	UuidModel
+	Name string
 }
 
 func (Categoria) TableName() string {
@@ -28,9 +29,22 @@ func (Categoria) TableName() string {
 }
 
 type Produto struct {
-	Name  string
-	Price float64
 	UuidModel
+	Name         string
+	Price        float64
+	CategoriaID  uuid.UUID
+	Categoria    Categoria
+	NumeroSerial SerialNumber
+}
+
+type SerialNumber struct {
+	gorm.Model
+	Number    string
+	ProdutoID uuid.UUID
+}
+
+func (SerialNumber) TableName() string {
+	return "catalogo.numero_seriais"
 }
 
 // func (u *Produto) BeforeCreate(tx *gorm.DB) error {
@@ -76,7 +90,19 @@ func main() {
 	ctx := context.Background()
 
 	// Migrate the schema
-	db.AutoMigrate(&Categoria{}, &Produto{})
+	err = db.AutoMigrate(&Categoria{}, &Produto{}, &SerialNumber{})
+	if err != nil {
+		panic(err)
+	}
+
+	// prod := criaCategoriaEProduto(db, ctx, "Categoria 1", "Produto 1", 34.87)
+
+	// gorm.G[SerialNumber](db).Create(ctx, &SerialNumber{
+	// 	Number:    "12345",
+	// 	ProdutoID: prod.ID,
+	// })
+
+	testaProduto(db, ctx)
 
 	// produto := Produto{Name: "Teste 5", Price: 1234.78}
 
@@ -163,4 +189,30 @@ func main() {
 	// 	fmt.Println("Não achou")
 	// }
 
+}
+
+func testaProduto(db *gorm.DB, ctx context.Context) {
+
+	// carrega a categoria eager
+	produtos, err := gorm.G[Produto](db).Preload("Categoria", nil).Preload("NumeroSerial", nil).Find(ctx)
+	if err != nil {
+		panic(err)
+	}
+	for _, p := range produtos {
+		fmt.Printf("Produto: %v\n", p)
+	}
+}
+
+func criaCategoriaEProduto(db *gorm.DB, ctx context.Context, nomeCategoria, nomeProduto string, preco float64) *Produto {
+	categoria := Categoria{Name: nomeCategoria}
+
+	gorm.G[Categoria](db).Create(ctx, &categoria)
+
+	produto := Produto{
+		Name:        nomeProduto,
+		Price:       preco,
+		CategoriaID: categoria.ID,
+	}
+	gorm.G[Produto](db).Create(ctx, &produto)
+	return &produto
 }
