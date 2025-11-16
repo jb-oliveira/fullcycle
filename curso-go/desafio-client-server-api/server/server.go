@@ -16,6 +16,27 @@ var (
 	appDB *gorm.DB
 )
 
+func GetDB() *gorm.DB {
+	return appDB
+}
+
+func InitializeSQLite() (*gorm.DB, error) {
+	fmt.Println("Initializing SQLite database")
+
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.AutoMigrate(&USDBRL{})
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("SQLite database initialized")
+
+	return db, nil
+}
+
 type USDBRL struct {
 	gorm.Model
 	Code       string `json:"code"`
@@ -42,11 +63,13 @@ type UrlResponse struct {
 func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 	request, err := loadDataFromUrl()
 	if err != nil {
+		fmt.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	err = saveToDataBase(request)
 	if err != nil {
+		fmt.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -63,13 +86,17 @@ func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 func saveToDataBase(entity *UrlRequest) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
-	return gorm.G[USDBRL](appDB).Create(ctx, &entity.USDBRL)
+	return gorm.G[USDBRL](GetDB()).Create(ctx, &entity.USDBRL)
 }
 
 func loadDataFromUrl() (*UrlRequest, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
-	res, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -84,24 +111,12 @@ func loadDataFromUrl() (*UrlRequest, error) {
 	return &result, nil
 }
 
-func InitializeSQLite() {
-	fmt.Println("Initializing SQLite database")
-
-	appDB, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = appDB.AutoMigrate(&USDBRL{})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("SQLite database initialized")
-
-}
-
 func main() {
-	InitializeSQLite()
-	http.HandleFunc("/", BuscaDolarHandler)
+	var err error
+	appDB, err = InitializeSQLite()
+	if err != nil {
+		panic(err)
+	}
+	http.HandleFunc("/cotacao", BuscaDolarHandler)
 	http.ListenAndServe(":8080", nil)
 }
