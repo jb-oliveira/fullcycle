@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -63,13 +64,13 @@ type UrlResponse struct {
 func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 	request, err := loadDataFromUrl()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println("Error consultando url", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	err = saveToDataBase(request)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println("Erro salvando no DB", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -77,7 +78,6 @@ func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 	result := UrlResponse{
 		Bid: request.USDBRL.Bid,
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -115,7 +115,7 @@ func main() {
 	var err error
 	appDB, err = InitializeSQLite()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	http.HandleFunc("/cotacao", BuscaDolarHandler)
 	http.ListenAndServe(":8080", nil)
