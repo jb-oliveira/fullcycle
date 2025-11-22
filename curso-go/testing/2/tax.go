@@ -1,0 +1,42 @@
+package tax
+
+import "errors"
+
+func CalculateTax(amount float64) (float64, error) {
+	if amount < 0 {
+		return 0.0, errors.New("Negative amount is not allowed")
+	}
+
+	if amount == 0 {
+		return 0, nil
+	}
+	if amount >= 1000 && amount < 20000 {
+		return 10, nil
+	}
+	if amount >= 20000 {
+		return 20, nil
+	}
+	return 5, nil
+}
+
+type TaxRepository interface {
+	Save(tax float64) error
+}
+
+func CalculateTaxAndSave(amount float64, repository TaxRepository) error {
+	tax := CalculateTax2(amount)
+	return repository.Save(tax)
+}
+
+func CalculateTax2(amount float64) float64 {
+	if amount <= 0 {
+		return 0.0
+	}
+	if amount >= 1000 && amount < 20000 {
+		return 10.0
+	}
+	if amount >= 20000 {
+		return 20.0
+	}
+	return 5.0
+}
