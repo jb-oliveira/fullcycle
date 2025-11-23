@@ -1,20 +1,8 @@
 package entity
 
 import (
-	"errors"
-
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
 	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	ErrUserIDRequired    = errors.New("ID do usuário é obrigatório e deve ser válido")
-	ErrUserNameRequired  = errors.New("nome do usuário é obrigatório")
-	ErrUserNameTooLong   = errors.New("nome do usuário não pode exceder 255 caracteres")
-	ErrUserEmailRequired = errors.New("email do usuário é obrigatório")
-	ErrUserEmailTooLong  = errors.New("email do usuário não pode exceder 255 caracteres")
-	ErrPasswordRequired  = errors.New("senha do usuário é obrigatória")
-	ErrPasswordTooLong   = errors.New("senha do usuário não pode exceder 255 caracteres")
 )
 
 type User struct {
@@ -30,22 +18,22 @@ func (User) TableName() string {
 
 func (u *User) Validate() error {
 	if u.ID.String() == "" {
-		return ErrUserIDRequired
+		return ErrIDRequired
 	}
 	if _, err := entity.ParseID(u.ID.String()); err != nil {
-		return ErrUserIDRequired
+		return ErrIDRequired
 	}
 	if u.Name == "" {
-		return ErrUserNameRequired
+		return ErrNameRequired
 	}
 	if len(u.Name) > 255 {
-		return ErrUserNameTooLong
+		return ErrNameTooLong
 	}
 	if u.Email == "" {
-		return ErrUserEmailRequired
+		return ErrEmailRequired
 	}
 	if len(u.Email) > 255 {
-		return ErrUserEmailTooLong
+		return ErrEmailTooLong
 	}
 	if u.Password == "" {
 		return ErrPasswordRequired

@@ -1,16 +1,7 @@
 package entity
 
 import (
-	"errors"
-
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
-)
-
-var (
-	ErrIDRequired   = errors.New("ID do produto é obrigatório e deve ser válido")
-	ErrNameRequired = errors.New("nome do produto é obrigatório")
-	ErrNameTooLong  = errors.New("nome do produto não pode exceder 255 caracteres")
-	ErrInvalidPrice = errors.New("preço do produto deve ser maior que zero")
 )
 
 type Product struct {

@@ -130,28 +130,28 @@ func TestNewUser_ValidatesFields(t *testing.T) {
 			userName:    "",
 			email:       "john@example.com",
 			password:    "password123",
-			expectError: ErrUserNameRequired,
+			expectError: ErrNameRequired,
 		},
 		{
 			name:        "name too long",
 			userName:    name256,
 			email:       "john@example.com",
 			password:    "password123",
-			expectError: ErrUserNameTooLong,
+			expectError: ErrNameTooLong,
 		},
 		{
 			name:        "empty email",
 			userName:    "John Doe",
 			email:       "",
 			password:    "password123",
-			expectError: ErrUserEmailRequired,
+			expectError: ErrEmailRequired,
 		},
 		{
 			name:        "email too long",
 			userName:    "John Doe",
 			email:       email256,
 			password:    "password123",
-			expectError: ErrUserEmailTooLong,
+			expectError: ErrEmailTooLong,
 		},
 		{
 			name:        "empty password",
@@ -232,7 +232,7 @@ func TestUser_Validate(t *testing.T) {
 				Email:    "user@example.com",
 				Password: "hashedpassword",
 			},
-			expectError: ErrUserNameRequired,
+			expectError: ErrNameRequired,
 		},
 		{
 			name: "name too long",
@@ -244,7 +244,7 @@ func TestUser_Validate(t *testing.T) {
 				Email:    "user@example.com",
 				Password: "hashedpassword",
 			},
-			expectError: ErrUserNameTooLong,
+			expectError: ErrNameTooLong,
 		},
 		{
 			name: "empty email",
@@ -256,7 +256,7 @@ func TestUser_Validate(t *testing.T) {
 				Email:    "",
 				Password: "hashedpassword",
 			},
-			expectError: ErrUserEmailRequired,
+			expectError: ErrEmailRequired,
 		},
 		{
 			name: "email too long",
@@ -268,7 +268,7 @@ func TestUser_Validate(t *testing.T) {
 				Email:    email256,
 				Password: "hashedpassword",
 			},
-			expectError: ErrUserEmailTooLong,
+			expectError: ErrEmailTooLong,
 		},
 		{
 			name: "empty password",
