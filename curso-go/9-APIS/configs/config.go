@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"fmt"
+
 	"github.com/go-chi/jwtauth"
 	"github.com/spf13/viper"
 )
@@ -26,7 +28,14 @@ type confWeb struct {
 	TokenAuth     *jwtauth.JWTAuth
 }
 
-func LoadDbConfig(path string) (*confDB, error) {
+func init() {
+	LoadDbConfig(".")
+	LoadWebConfig(".")
+	fmt.Printf("DBConfig: %v", dbConfig)
+	fmt.Printf("WebConfig: %v", webConfig)
+}
+
+func LoadDbConfig(path string) {
 	viper.SetConfigName("db_config")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
@@ -45,10 +54,9 @@ func LoadDbConfig(path string) (*confDB, error) {
 		panic(err)
 	}
 
-	return dbConfig, err
 }
 
-func LoadWebConfig(path string) (*confWeb, error) {
+func LoadWebConfig(path string) {
 	viper.SetConfigName("web_config")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
@@ -69,5 +77,4 @@ func LoadWebConfig(path string) (*confWeb, error) {
 
 	webConfig.TokenAuth = jwtauth.New("HS256", []byte(webConfig.JWTSecret), nil)
 
-	return webConfig, err
 }

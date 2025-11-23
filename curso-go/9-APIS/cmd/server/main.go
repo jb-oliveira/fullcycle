@@ -1,14 +1,7 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/jb-oliveira/fullcycle/tree/main/curso-go/9-APIS/configs"
-)
+import _ "github.com/jb-oliveira/fullcycle/tree/main/curso-go/9-APIS/configs" // used to execute init() method in config
 
 func main() {
-	dbConf, _ := configs.LoadDbConfig(".")
-	fmt.Printf("DBConfig: %v", &dbConf)
-	webConf, _ := configs.LoadWebConfig(".")
-	fmt.Printf("WebConfig: %v", &webConf)
+
 }
