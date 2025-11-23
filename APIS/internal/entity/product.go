@@ -14,8 +14,8 @@ var (
 
 type Product struct {
 	entity.IDModel
-	Name  string  `json:"name" gorm:"column:prd_name"`
-	Price float64 `json:"price" gorm:"column:prd_price"`
+	Name  string  `json:"name" gorm:"column:prd_name;size:255"`
+	Price float64 `json:"price" gorm:"column:prd_price;type:decimal(10,2)"`
 }
 
 func (Product) TableName() string {

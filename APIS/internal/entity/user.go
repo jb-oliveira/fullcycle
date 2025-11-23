@@ -7,9 +7,9 @@ import (
 
 type User struct {
 	entity.IDModel
-	Name     string `json:"name" gorm:"column:usr_name"`
-	Email    string `json:"email" gorm:"column:usr_email"`
-	Password string `json:"-" gorm:"column:usr_password"`
+	Name     string `json:"name" gorm:"column:usr_name;size:255"`
+	Email    string `json:"email" gorm:"column:usr_email;size:255"`
+	Password string `json:"-" gorm:"column:usr_password;size:255"`
 }
 
 func (User) TableName() string {
