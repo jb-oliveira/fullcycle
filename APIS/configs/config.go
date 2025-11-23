@@ -2,6 +2,7 @@ package configs
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/go-chi/jwtauth"
 	"github.com/spf13/viper"
@@ -101,6 +102,9 @@ func InitGorm() error {
 }
 
 func GetDB() *gorm.DB {
+	if db == nil {
+		log.Fatal("GORM DB não inicializado")
+	}
 	return db
 }
 
