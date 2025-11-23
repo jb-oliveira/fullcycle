@@ -45,7 +45,7 @@ func (p *Product) FindByID(id string) (*entity.Product, error) {
 		return nil, err
 	}
 
-	product, err := gorm.G[entity.Product](p.db).Where("id = ?", productID).First(ctx)
+	product, err := gorm.G[entity.Product](p.db).Where("prd_id = ?", productID).First(ctx)
 	return &product, err
 }
 
@@ -65,7 +65,7 @@ func (p *Product) Delete(id string) error {
 		return err
 	}
 
-	_, err = gorm.G[entity.Product](p.db).Where("id = ?", productID).Delete(ctx)
+	_, err = gorm.G[entity.Product](p.db).Where("prd_id = ?", productID).Delete(ctx)
 	return err
 }
 
@@ -73,5 +73,5 @@ func (p *Product) Count() (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
 	defer cancel()
 
-	return gorm.G[entity.Product](p.db).Count(ctx, "id")
+	return gorm.G[entity.Product](p.db).Count(ctx, "prd_id")
 }

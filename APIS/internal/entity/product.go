@@ -5,7 +5,7 @@ import (
 )
 
 type Product struct {
-	ID    entity.ID `json:"id" gorm:"type:uuid;primarykey"`
+	ID    entity.ID `json:"id" gorm:"column:prd_id;type:uuid;primarykey"`
 	Name  string    `json:"name" gorm:"column:prd_name;size:255"`
 	Price float64   `json:"price" gorm:"column:prd_price;type:decimal(10,2)"`
 	entity.BaseModel

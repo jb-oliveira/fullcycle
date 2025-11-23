@@ -240,7 +240,7 @@ func TestProduct_Delete(t *testing.T) {
 
 		// Verify deletion (soft delete)
 		var count int64
-		db.Model(&entity.Product{}).Unscoped().Where("id = ?", product.ID).Count(&count)
+		db.Model(&entity.Product{}).Unscoped().Where("prd_id = ?", product.ID).Count(&count)
 		assert.Equal(t, int64(1), count)
 
 		// Verify not found in normal query
