@@ -25,7 +25,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 
 func TestNewUser(t *testing.T) {
 	db := setupTestDB(t)
-	userDB := NewUser(db)
+	userDB := NewUserDB(db)
 
 	assert.NotNil(t, userDB)
 	assert.NotNil(t, userDB.db)
@@ -34,7 +34,7 @@ func TestNewUser(t *testing.T) {
 func TestUser_Create(t *testing.T) {
 	t.Run("should create user successfully", func(t *testing.T) {
 		db := setupTestDB(t)
-		userDB := NewUser(db)
+		userDB := NewUserDB(db)
 
 		user, err := entity.NewUser("John Doe", "john@example.com", "password123")
 		require.NoError(t, err)
@@ -50,7 +50,7 @@ func TestUser_Create(t *testing.T) {
 
 	t.Run("should return error for duplicate email", func(t *testing.T) {
 		db := setupTestDB(t)
-		userDB := NewUser(db)
+		userDB := NewUserDB(db)
 
 		user1, err := entity.NewUser("John Doe", "john@example.com", "password123")
 		require.NoError(t, err)
@@ -69,7 +69,7 @@ func TestUser_Create(t *testing.T) {
 func TestUser_FindByEmail(t *testing.T) {
 	t.Run("should find user by email successfully", func(t *testing.T) {
 		db := setupTestDB(t)
-		userDB := NewUser(db)
+		userDB := NewUserDB(db)
 
 		user, err := entity.NewUser("John Doe", "john@example.com", "password123")
 		require.NoError(t, err)
@@ -87,7 +87,7 @@ func TestUser_FindByEmail(t *testing.T) {
 
 	t.Run("should return error when user not found", func(t *testing.T) {
 		db := setupTestDB(t)
-		userDB := NewUser(db)
+		userDB := NewUserDB(db)
 
 		foundUser, err := userDB.FindByEmail("nonexistent@example.com")
 		assert.Error(t, err)
@@ -97,7 +97,7 @@ func TestUser_FindByEmail(t *testing.T) {
 
 	t.Run("should find correct user when multiple users exist", func(t *testing.T) {
 		db := setupTestDB(t)
-		userDB := NewUser(db)
+		userDB := NewUserDB(db)
 
 		user1, err := entity.NewUser("John Doe", "john@example.com", "password123")
 		require.NoError(t, err)

@@ -24,7 +24,7 @@ func setupProductTestDB(t *testing.T) *gorm.DB {
 
 func TestNewProduct(t *testing.T) {
 	db := setupProductTestDB(t)
-	productDB := NewProduct(db)
+	productDB := NewProductDB(db)
 
 	assert.NotNil(t, productDB)
 	assert.NotNil(t, productDB.db)
@@ -33,7 +33,7 @@ func TestNewProduct(t *testing.T) {
 func TestProduct_Create(t *testing.T) {
 	t.Run("should create product successfully", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product, err := entity.NewProduct("Laptop", 999.99)
 		require.NoError(t, err)
@@ -48,7 +48,7 @@ func TestProduct_Create(t *testing.T) {
 
 	t.Run("should create multiple products", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product1, err := entity.NewProduct("Laptop", 999.99)
 		require.NoError(t, err)
@@ -69,7 +69,7 @@ func TestProduct_Create(t *testing.T) {
 func TestProduct_FindByID(t *testing.T) {
 	t.Run("should find product by ID successfully", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product, err := entity.NewProduct("Keyboard", 79.99)
 		require.NoError(t, err)
@@ -87,7 +87,7 @@ func TestProduct_FindByID(t *testing.T) {
 
 	t.Run("should return error when product not found", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		foundProduct, err := productDB.FindByID("019ab24a-dc97-72a4-9056-cc09f4c13bef")
 		assert.Error(t, err)
@@ -97,7 +97,7 @@ func TestProduct_FindByID(t *testing.T) {
 
 	t.Run("should return error for invalid ID format", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		foundProduct, err := productDB.FindByID("invalid-uuid")
 		assert.Error(t, err)
@@ -108,7 +108,7 @@ func TestProduct_FindByID(t *testing.T) {
 func TestProduct_FindAll(t *testing.T) {
 	t.Run("should find all products with pagination", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		// Create test products
 		products := []struct {
@@ -146,7 +146,7 @@ func TestProduct_FindAll(t *testing.T) {
 
 	t.Run("should return empty list when no products exist", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		result, err := productDB.FindAll(1, 10, "prd_name ASC")
 		assert.NoError(t, err)
@@ -155,7 +155,7 @@ func TestProduct_FindAll(t *testing.T) {
 
 	t.Run("should sort by price descending", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product1, _ := entity.NewProduct("Cheap", 10.00)
 		product2, _ := entity.NewProduct("Expensive", 100.00)
@@ -177,7 +177,7 @@ func TestProduct_FindAll(t *testing.T) {
 func TestProduct_Update(t *testing.T) {
 	t.Run("should update product successfully", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product, err := entity.NewProduct("Old Name", 99.99)
 		require.NoError(t, err)
@@ -201,7 +201,7 @@ func TestProduct_Update(t *testing.T) {
 
 	t.Run("should update only price", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product, err := entity.NewProduct("Product", 50.00)
 		require.NoError(t, err)
@@ -226,7 +226,7 @@ func TestProduct_Update(t *testing.T) {
 func TestProduct_Delete(t *testing.T) {
 	t.Run("should delete product successfully", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		product, err := entity.NewProduct("To Delete", 99.99)
 		require.NoError(t, err)
@@ -252,7 +252,7 @@ func TestProduct_Delete(t *testing.T) {
 
 	t.Run("should return error for invalid ID format", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		err := productDB.Delete("invalid-uuid")
 		assert.Error(t, err)
@@ -260,7 +260,7 @@ func TestProduct_Delete(t *testing.T) {
 
 	t.Run("should not error when deleting non-existent product", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		err := productDB.Delete("019ab24a-dc97-72a4-9056-cc09f4c13bef")
 		assert.NoError(t, err)
@@ -270,7 +270,7 @@ func TestProduct_Delete(t *testing.T) {
 func TestProduct_Count(t *testing.T) {
 	t.Run("should return zero when no products exist", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		count, err := productDB.Count()
 		assert.NoError(t, err)
@@ -279,7 +279,7 @@ func TestProduct_Count(t *testing.T) {
 
 	t.Run("should return correct count with products", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		// Create test products
 		for i := 1; i <= 5; i++ {
@@ -296,7 +296,7 @@ func TestProduct_Count(t *testing.T) {
 
 	t.Run("should not count deleted products", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		// Create products
 		product1, _ := entity.NewProduct("Product 1", 10.00)
@@ -319,7 +319,7 @@ func TestProduct_Count(t *testing.T) {
 
 	t.Run("should return count after updates", func(t *testing.T) {
 		db := setupProductTestDB(t)
-		productDB := NewProduct(db)
+		productDB := NewProductDB(db)
 
 		// Create product
 		product, err := entity.NewProduct("Original", 50.00)
