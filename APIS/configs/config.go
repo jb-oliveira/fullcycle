@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/go-chi/jwtauth"
 	"github.com/spf13/viper"
@@ -102,10 +101,6 @@ func InitGorm() error {
 }
 
 func GetDB() *gorm.DB {
-	if db == nil {
-		log.Fatalf("Banco de dados não foi inicializado!")
-		return nil
-	}
 	return db
 }
 

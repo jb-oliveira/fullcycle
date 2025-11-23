@@ -12,6 +12,10 @@ type User struct {
 	Password string `json:"-" gorm:"column:usr_password"`
 }
 
+func (User) TableName() string {
+	return "users"
+}
+
 func (u *User) ValidatePassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil

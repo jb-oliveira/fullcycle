@@ -18,6 +18,10 @@ type Product struct {
 	Price float64 `json:"price" gorm:"column:prd_price"`
 }
 
+func (Product) TableName() string {
+	return "products"
+}
+
 func (p *Product) Validate() error {
 	if p.ID.String() == "" {
 		return ErrIDRequired

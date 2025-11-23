@@ -640,25 +640,22 @@ func TestGetDSN_WithoutLoadingConfig(t *testing.T) {
 	}
 }
 
-// TestNewDB_WithoutLoadingConfig tests error when config not loaded
-func TestNewDB_WithoutLoadingConfig(t *testing.T) {
+// TestInitGorm_WithoutLoadingConfig tests error when config not loaded
+func TestInitGorm_WithoutLoadingConfig(t *testing.T) {
 	cleanupViper()
 	defer cleanupViper()
 
 	// Reset dbConfig to nil
 	dbConfig = nil
 
-	db, err := InitGorm()
+	err := InitGorm()
 	if err == nil {
-		t.Errorf("NewDB() expected error when config not loaded, got nil")
-	}
-	if db != nil {
-		t.Errorf("NewDB() expected nil db, got %v", db)
+		t.Errorf("InitGorm() expected error when config not loaded, got nil")
 	}
 }
 
-// TestNewDB_UnsupportedDriver tests error for unsupported drivers
-func TestNewDB_UnsupportedDriver(t *testing.T) {
+// TestInitGorm_UnsupportedDriver tests error for unsupported drivers
+func TestInitGorm_UnsupportedDriver(t *testing.T) {
 	cleanupViper()
 	defer cleanupViper()
 
@@ -675,18 +672,15 @@ DB_NAME=testdb`)
 		t.Fatalf("LoadDbConfig() error = %v", err)
 	}
 
-	db, err := InitGorm()
+	err = InitGorm()
 	if err == nil {
-		t.Errorf("NewDB() expected error for unsupported driver, got nil")
-	}
-	if db != nil {
-		t.Errorf("NewDB() expected nil db for unsupported driver, got %v", db)
+		t.Errorf("InitGorm() expected error for unsupported driver, got nil")
 	}
 }
 
-// TestNewDB_DriversNotInstalled tests that appropriate errors are returned
+// TestInitGorm_DriversNotInstalled tests that appropriate errors are returned
 // when GORM drivers are not installed (or database connection fails)
-func TestNewDB_DriversNotInstalled(t *testing.T) {
+func TestInitGorm_DriversNotInstalled(t *testing.T) {
 	tests := []struct {
 		driver      string
 		expectError bool
@@ -715,12 +709,9 @@ DB_NAME=testdb`, tt.driver)
 				t.Fatalf("LoadDbConfig() error = %v", err)
 			}
 
-			db, err := InitGorm()
+			err = InitGorm()
 			if tt.expectError && err == nil {
-				t.Errorf("NewDB() expected error for %s, got nil", tt.driver)
-			}
-			if tt.expectError && db != nil {
-				t.Errorf("NewDB() expected nil db, got %v", db)
+				t.Errorf("InitGorm() expected error for %s, got nil", tt.driver)
 			}
 		})
 	}
@@ -783,7 +774,7 @@ JWT_EXPIRATION=3600`)
 	}
 }
 
-// TestGetDB_BeforeInitialization tests that GetDB returns nil before NewDB is called
+// TestGetDB_BeforeInitialization tests that GetDB returns nil before InitGorm is called
 func TestGetDB_BeforeInitialization(t *testing.T) {
 	cleanupViper()
 	defer cleanupViper()
@@ -798,7 +789,7 @@ func TestGetDB_BeforeInitialization(t *testing.T) {
 }
 
 // TestGetDB_AfterSuccessfulInitialization tests that GetDB returns the database instance
-// after a successful NewDB call. This test requires a running PostgreSQL instance.
+// after a successful InitGorm call. This test requires a running PostgreSQL instance.
 func TestGetDB_AfterSuccessfulInitialization(t *testing.T) {
 	cleanupViper()
 	defer cleanupViper()
@@ -821,18 +812,15 @@ DB_NAME=myapp`)
 	}
 
 	// Try to initialize DB
-	dbInstance, err := InitGorm()
+	err = InitGorm()
 	if err != nil {
 		// If DB connection fails, skip this test (DB might not be running)
 		t.Skipf("Skipping test: database not available: %v", err)
 	}
 
-	// GetDB should return the same instance
+	// GetDB should return the database instance
 	retrieved := GetDB()
 	if retrieved == nil {
-		t.Error("GetDB() expected non-nil after successful NewDB call")
-	}
-	if retrieved != dbInstance {
-		t.Error("GetDB() should return the same instance as NewDB()")
+		t.Error("GetDB() expected non-nil after successful InitGorm call")
 	}
 }
