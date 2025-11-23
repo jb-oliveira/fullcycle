@@ -7,40 +7,39 @@ import (
 )
 
 func main() {
-	// Load database configuration
 	_, err := configs.LoadDbConfig(".")
 	if err != nil {
-		log.Fatalf("failed to load database config: %v", err)
+		log.Fatalf("falha ao carregar configuração do banco: %v", err)
 	}
 
-	// Load web server configuration
 	_, err = configs.LoadWebConfig(".")
 	if err != nil {
-		log.Fatalf("failed to load web config: %v", err)
+		log.Fatalf("falha ao carregar configuração web: %v", err)
 	}
 
-	// Get DSN for logging (optional)
 	dsn, err := configs.GetDSN()
 	if err != nil {
-		log.Printf("warning: could not get DSN: %v", err)
+		log.Printf("aviso: não foi possível obter DSN: %v", err)
 	} else {
-		log.Printf("Database DSN configured: %s", dsn)
+		log.Printf("DSN do banco configurado: %s", dsn)
 	}
 
-	// Initialize database connection
-	db, err := configs.NewDB()
+	_, err = configs.NewDB()
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("falha ao conectar ao banco: %v", err)
 	}
-	log.Println("Database connection established")
+	log.Println("Conexão com banco estabelecida")
 
-	// Get underlying SQL DB for connection pool configuration
+	db := configs.GetDB()
+	if db == nil {
+		log.Fatal("instância do banco é nula")
+	}
+
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("failed to get database instance: %v", err)
+		log.Fatalf("falha ao obter instância do banco: %v", err)
 	}
 	defer sqlDB.Close()
 
-	// Configuration loaded successfully
-	log.Println("Configuration loaded successfully")
+	log.Println("Configuração carregada com sucesso")
 }

@@ -12,6 +12,7 @@ import (
 var (
 	dbConfig  *confDB
 	webConfig *confWeb
+	db        *gorm.DB
 )
 
 type confDB struct {
@@ -30,8 +31,6 @@ type confWeb struct {
 	TokenAuth     *jwtauth.JWTAuth
 }
 
-// LoadDbConfig loads database configuration from the specified path.
-// Returns error if file is missing or cannot be parsed.
 func LoadDbConfig(path string) (*confDB, error) {
 	v := viper.New()
 	v.SetConfigName(".env")
@@ -41,21 +40,19 @@ func LoadDbConfig(path string) (*confDB, error) {
 
 	err := v.ReadInConfig()
 	if err != nil {
-		return nil, fmt.Errorf("reading db config file: %w", err)
+		return nil, fmt.Errorf("erro ao ler arquivo de configuração do banco: %w", err)
 	}
 
 	var config confDB
 	err = v.Unmarshal(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshaling db config: %w", err)
+		return nil, fmt.Errorf("erro ao deserializar configuração do banco: %w", err)
 	}
 
 	dbConfig = &config
 	return &config, nil
 }
 
-// LoadWebConfig loads web server configuration from the specified path.
-// Returns error if file is missing or cannot be parsed.
 func LoadWebConfig(path string) (*confWeb, error) {
 	v := viper.New()
 	v.SetConfigName(".env")
@@ -65,13 +62,13 @@ func LoadWebConfig(path string) (*confWeb, error) {
 
 	err := v.ReadInConfig()
 	if err != nil {
-		return nil, fmt.Errorf("reading web config file: %w", err)
+		return nil, fmt.Errorf("erro ao ler arquivo de configuração web: %w", err)
 	}
 
 	var config confWeb
 	err = v.Unmarshal(&config)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshaling web config: %w", err)
+		return nil, fmt.Errorf("erro ao deserializar configuração web: %w", err)
 	}
 
 	config.TokenAuth = jwtauth.New("HS256", []byte(config.JWTSecret), nil)
@@ -79,25 +76,17 @@ func LoadWebConfig(path string) (*confWeb, error) {
 	return &config, nil
 }
 
-// GetDbConfig returns the loaded database configuration.
 func GetDbConfig() *confDB {
 	return dbConfig
 }
 
-// GetWebConfig returns the loaded web configuration.
 func GetWebConfig() *confWeb {
 	return webConfig
 }
 
-// NewDB creates and returns a new GORM database connection using the loaded DB configuration.
-// Returns error if dbConfig is not loaded or connection fails.
-// Note: This function requires the appropriate GORM driver to be installed:
-//   - postgres: gorm.io/driver/postgres (installed)
-//   - mysql: gorm.io/driver/mysql
-//   - sqlite: gorm.io/driver/sqlite
 func NewDB() (*gorm.DB, error) {
 	if dbConfig == nil {
-		return nil, fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
+		return nil, fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
 	}
 
 	var dialector gorm.Dialector
@@ -107,22 +96,26 @@ func NewDB() (*gorm.DB, error) {
 	case "postgres", "postgresql":
 		dialector = postgres.Open(dsn)
 	case "mysql":
-		return nil, fmt.Errorf("mysql driver not implemented: install gorm.io/driver/mysql")
+		return nil, fmt.Errorf("driver mysql não implementado: instale gorm.io/driver/mysql")
 	case "sqlite", "sqlite3":
-		return nil, fmt.Errorf("sqlite driver not implemented: install gorm.io/driver/sqlite")
+		return nil, fmt.Errorf("driver sqlite não implementado: instale gorm.io/driver/sqlite")
 	default:
-		return nil, fmt.Errorf("unsupported database driver: %s (supported: postgres, mysql, sqlite)", dbConfig.DBDriver)
+		return nil, fmt.Errorf("driver de banco não suportado: %s (suportados: postgres, mysql, sqlite)", dbConfig.DBDriver)
 	}
 
-	db, err := gorm.Open(dialector, &gorm.Config{})
+	dbInstance, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("opening database connection: %w", err)
+		return nil, fmt.Errorf("erro ao abrir conexão com banco: %w", err)
 	}
 
+	db = dbInstance
 	return db, nil
 }
 
-// buildDSN constructs a database connection string from the configuration.
+func GetDB() *gorm.DB {
+	return db
+}
+
 func buildDSN(config *confDB) string {
 	switch config.DBDriver {
 	case "postgres", "postgresql":
@@ -132,21 +125,19 @@ func buildDSN(config *confDB) string {
 		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
 	case "sqlite", "sqlite3":
-		return config.DBName // SQLite uses file path as DSN
+		return config.DBName
 	default:
 		return ""
 	}
 }
 
-// GetDSN returns the database connection string for the loaded configuration.
-// Returns error if dbConfig is not loaded.
 func GetDSN() (string, error) {
 	if dbConfig == nil {
-		return "", fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
+		return "", fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
 	}
 	dsn := buildDSN(dbConfig)
 	if dsn == "" {
-		return "", fmt.Errorf("unsupported database driver: %s", dbConfig.DBDriver)
+		return "", fmt.Errorf("driver de banco não suportado: %s", dbConfig.DBDriver)
 	}
 	return dsn, nil
 }

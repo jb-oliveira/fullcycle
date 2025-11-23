@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// createTestEnvFile creates a temporary .env file with the given content
 func createTestEnvFile(t *testing.T, dir string, content string) string {
 	t.Helper()
 	envPath := filepath.Join(dir, ".env")
@@ -20,10 +19,8 @@ func createTestEnvFile(t *testing.T, dir string, content string) string {
 	return envPath
 }
 
-// cleanupViper resets Viper state between tests
 func cleanupViper() {
 	viper.Reset()
-	// Clear any environment variables that might interfere
 	os.Unsetenv("DB_DRIVER")
 	os.Unsetenv("DB_HOST")
 	os.Unsetenv("DB_PORT")
@@ -35,7 +32,6 @@ func cleanupViper() {
 	os.Unsetenv("JWT_EXPIRATION")
 }
 
-// TestLoadDbConfig tests loading database configuration with valid inputs
 func TestLoadDbConfig(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -47,50 +43,50 @@ func TestLoadDbConfig(t *testing.T) {
 			envContent: `DB_DRIVER=postgres
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=testuser
-DB_PASSWORD=testpass
-DB_NAME=testdb`,
+DB_USER=usuario_teste
+DB_PASSWORD=senha_teste
+DB_NAME=banco_teste`,
 			expectedConfig: &confDB{
 				DBDriver:   "postgres",
 				DBHost:     "localhost",
 				DBPort:     "5432",
-				DBUser:     "testuser",
-				DBPassword: "testpass",
-				DBName:     "testdb",
+				DBUser:     "usuario_teste",
+				DBPassword: "senha_teste",
+				DBName:     "banco_teste",
 			},
 		},
 		{
 			name: "config with special characters",
 			envContent: `DB_DRIVER=mysql
-DB_HOST=db.example.com
+DB_HOST=bd.exemplo.com
 DB_PORT=3306
-DB_USER=user@domain
-DB_PASSWORD="p@ss!w0rd#123"
-DB_NAME=my-database`,
+DB_USER=usuario@dominio
+DB_PASSWORD="s3nh@!#123"
+DB_NAME=meu-banco`,
 			expectedConfig: &confDB{
 				DBDriver:   "mysql",
-				DBHost:     "db.example.com",
+				DBHost:     "bd.exemplo.com",
 				DBPort:     "3306",
-				DBUser:     "user@domain",
-				DBPassword: "p@ss!w0rd#123",
-				DBName:     "my-database",
+				DBUser:     "usuario@dominio",
+				DBPassword: "s3nh@!#123",
+				DBName:     "meu-banco",
 			},
 		},
 		{
 			name: "config with spaces in values",
 			envContent: `DB_DRIVER=sqlite
-DB_HOST=local host
+DB_HOST=host local
 DB_PORT=0
-DB_USER=test user
-DB_PASSWORD=test pass
-DB_NAME=test db`,
+DB_USER=usuario teste
+DB_PASSWORD=senha teste
+DB_NAME=banco teste`,
 			expectedConfig: &confDB{
 				DBDriver:   "sqlite",
-				DBHost:     "local host",
+				DBHost:     "host local",
 				DBPort:     "0",
-				DBUser:     "test user",
-				DBPassword: "test pass",
-				DBName:     "test db",
+				DBUser:     "usuario teste",
+				DBPassword: "senha teste",
+				DBName:     "banco teste",
 			},
 		},
 	}
@@ -777,5 +773,59 @@ JWT_EXPIRATION=3600`)
 	}
 	if retrieved.JWTSecret != config.JWTSecret {
 		t.Errorf("GetWebConfig().JWTSecret = %v, want %v", retrieved.JWTSecret, config.JWTSecret)
+	}
+}
+
+// TestGetDB_BeforeInitialization tests that GetDB returns nil before NewDB is called
+func TestGetDB_BeforeInitialization(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	// Reset db to nil
+	db = nil
+
+	retrieved := GetDB()
+	if retrieved != nil {
+		t.Errorf("GetDB() expected nil before initialization, got %v", retrieved)
+	}
+}
+
+// TestGetDB_AfterSuccessfulInitialization tests that GetDB returns the database instance
+// after a successful NewDB call. This test requires a running PostgreSQL instance.
+func TestGetDB_AfterSuccessfulInitialization(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	// Reset db to nil
+	db = nil
+
+	tmpDir := t.TempDir()
+	// Use the actual working credentials from cmd/server/.env
+	createTestEnvFile(t, tmpDir, `DB_DRIVER=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=myapp`)
+
+	_, err := LoadDbConfig(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadDbConfig() error = %v", err)
+	}
+
+	// Try to initialize DB
+	dbInstance, err := NewDB()
+	if err != nil {
+		// If DB connection fails, skip this test (DB might not be running)
+		t.Skipf("Skipping test: database not available: %v", err)
+	}
+
+	// GetDB should return the same instance
+	retrieved := GetDB()
+	if retrieved == nil {
+		t.Error("GetDB() expected non-nil after successful NewDB call")
+	}
+	if retrieved != dbInstance {
+		t.Error("GetDB() should return the same instance as NewDB()")
 	}
 }

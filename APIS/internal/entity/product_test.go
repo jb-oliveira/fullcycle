@@ -8,13 +8,13 @@ import (
 )
 
 func TestNewProduct(t *testing.T) {
-	product, err := NewProduct("Laptop", 999.99)
+	product, err := NewProduct("Notebook", 2999.99)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
 	assert.NotEmpty(t, product.ID)
-	assert.Equal(t, "Laptop", product.Name)
-	assert.Equal(t, 999.99, product.Price)
+	assert.Equal(t, "Notebook", product.Name)
+	assert.Equal(t, 2999.99, product.Price)
 }
 
 func TestNewProduct_ValidatesFields(t *testing.T) {
@@ -38,7 +38,7 @@ func TestNewProduct_ValidatesFields(t *testing.T) {
 		},
 		{
 			name:        "zero price",
-			productName: "Keyboard",
+			productName: "Teclado",
 			price:       0,
 			expectError: ErrInvalidPrice,
 		},
@@ -68,8 +68,8 @@ func TestNewProduct_ValidatesFields(t *testing.T) {
 }
 
 func TestNewProduct_GeneratesUniqueIDs(t *testing.T) {
-	product1, err1 := NewProduct("Product One", 10.0)
-	product2, err2 := NewProduct("Product Two", 20.0)
+	product1, err1 := NewProduct("Produto Um", 10.0)
+	product2, err2 := NewProduct("Produto Dois", 20.0)
 
 	assert.Nil(t, err1)
 	assert.Nil(t, err2)
@@ -88,7 +88,7 @@ func TestProduct_Validate(t *testing.T) {
 				IDModel: entity.IDModel{
 					ID: entity.NewID(),
 				},
-				Name:  "Valid Product",
+				Name:  "Produto Válido",
 				Price: 100.0,
 			},
 			expectError: nil,
@@ -110,7 +110,7 @@ func TestProduct_Validate(t *testing.T) {
 				IDModel: entity.IDModel{
 					ID: entity.NewID(),
 				},
-				Name:  "Product",
+				Name:  "Produto",
 				Price: 0,
 			},
 			expectError: ErrInvalidPrice,
@@ -121,7 +121,7 @@ func TestProduct_Validate(t *testing.T) {
 				IDModel: entity.IDModel{
 					ID: entity.NewID(),
 				},
-				Name:  "Product",
+				Name:  "Produto",
 				Price: -10.0,
 			},
 			expectError: ErrInvalidPrice,
@@ -142,15 +142,15 @@ func TestProduct_Validate(t *testing.T) {
 }
 
 func TestNewProduct_WithSpecialCharactersInName(t *testing.T) {
-	product, err := NewProduct("Product @#$% Special!", 99.99)
+	product, err := NewProduct("Produto @#$% Especial!", 99.99)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
-	assert.Equal(t, "Product @#$% Special!", product.Name)
+	assert.Equal(t, "Produto @#$% Especial!", product.Name)
 }
 
 func TestNewProduct_WithVerySmallPrice(t *testing.T) {
-	product, err := NewProduct("Cheap Item", 0.01)
+	product, err := NewProduct("Item Barato", 0.01)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
@@ -158,7 +158,7 @@ func TestNewProduct_WithVerySmallPrice(t *testing.T) {
 }
 
 func TestNewProduct_WithVeryLargePrice(t *testing.T) {
-	product, err := NewProduct("Expensive Item", 999999.99)
+	product, err := NewProduct("Item Caro", 999999.99)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
@@ -166,7 +166,7 @@ func TestNewProduct_WithVeryLargePrice(t *testing.T) {
 }
 
 func TestNewProduct_WithLongName(t *testing.T) {
-	longName := "This is a very long product name that contains many characters and should still be valid"
+	longName := "Este é um nome de produto muito longo que contém muitos caracteres e ainda deve ser válido"
 	product, err := NewProduct(longName, 50.0)
 
 	assert.Nil(t, err)
@@ -175,17 +175,14 @@ func TestNewProduct_WithLongName(t *testing.T) {
 }
 
 func TestProduct_Validate_WithZeroUUID(t *testing.T) {
-	// Zero UUID is technically valid (00000000-0000-0000-0000-000000000000)
-	// but may not be desirable in production. This test documents current behavior.
 	product := &Product{
 		IDModel: entity.IDModel{
-			ID: entity.ID{}, // Zero UUID
+			ID: entity.ID{},
 		},
-		Name:  "Product",
+		Name:  "Produto",
 		Price: 100.0,
 	}
 
 	err := product.Validate()
-	// Current implementation accepts zero UUID as valid
 	assert.Nil(t, err)
 }
