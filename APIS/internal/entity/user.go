@@ -6,10 +6,10 @@ import (
 )
 
 type User struct {
-	ID       entity.ID `json:"id"`
-	Name     string    `json:"name"`
-	Email    string    `json:"email"`
-	Password string    `json:"-"`
+	entity.IDModel
+	Name     string `json:"name" gorm:"column:usr_name"`
+	Email    string `json:"email" gorm:"column:usr_email"`
+	Password string `json:"-" gorm:"column:usr_password"`
 }
 
 func (u *User) ValidatePassword(password string) bool {
