@@ -213,9 +213,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "valid user",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "Valid User",
 				Email:    "valid@example.com",
 				Password: "hashedpassword",
@@ -225,9 +223,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "empty name",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "",
 				Email:    "user@example.com",
 				Password: "hashedpassword",
@@ -237,9 +233,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "name too long",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     name256,
 				Email:    "user@example.com",
 				Password: "hashedpassword",
@@ -249,9 +243,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "empty email",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "User Name",
 				Email:    "",
 				Password: "hashedpassword",
@@ -261,9 +253,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "email too long",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "User Name",
 				Email:    email256,
 				Password: "hashedpassword",
@@ -273,9 +263,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "empty password",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "User Name",
 				Email:    "user@example.com",
 				Password: "",
@@ -285,9 +273,7 @@ func TestUser_Validate(t *testing.T) {
 		{
 			name: "password too long",
 			user: &User{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:       entity.NewID(),
 				Name:     "User Name",
 				Email:    "user@example.com",
 				Password: password256,

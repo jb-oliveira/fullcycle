@@ -100,9 +100,7 @@ func TestProduct_Validate(t *testing.T) {
 		{
 			name: "valid product",
 			product: &Product{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:    entity.NewID(),
 				Name:  "Valid Product",
 				Price: 100.0,
 			},
@@ -111,9 +109,7 @@ func TestProduct_Validate(t *testing.T) {
 		{
 			name: "empty name",
 			product: &Product{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:    entity.NewID(),
 				Name:  "",
 				Price: 50.0,
 			},
@@ -122,9 +118,7 @@ func TestProduct_Validate(t *testing.T) {
 		{
 			name: "name too long",
 			product: &Product{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:    entity.NewID(),
 				Name:  name256,
 				Price: 50.0,
 			},
@@ -133,9 +127,7 @@ func TestProduct_Validate(t *testing.T) {
 		{
 			name: "zero price",
 			product: &Product{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:    entity.NewID(),
 				Name:  "Product",
 				Price: 0,
 			},
@@ -144,9 +136,7 @@ func TestProduct_Validate(t *testing.T) {
 		{
 			name: "negative price",
 			product: &Product{
-				IDModel: entity.IDModel{
-					ID: entity.NewID(),
-				},
+				ID:    entity.NewID(),
 				Name:  "Product",
 				Price: -10.0,
 			},
@@ -212,9 +202,7 @@ func TestNewProduct_WithLongName(t *testing.T) {
 // has a zero UUID. Currently, the implementation accepts this as valid.
 func TestProduct_Validate_WithZeroUUID(t *testing.T) {
 	product := &Product{
-		IDModel: entity.IDModel{
-			ID: entity.ID{},
-		},
+		ID:    entity.ID{},
 		Name:  "Product",
 		Price: 100.0,
 	}

@@ -5,9 +5,10 @@ import (
 )
 
 type Product struct {
-	entity.IDModel
-	Name  string  `json:"name" gorm:"column:prd_name;size:255"`
-	Price float64 `json:"price" gorm:"column:prd_price;type:decimal(10,2)"`
+	ID    entity.ID `json:"id" gorm:"type:uuid;primarykey"`
+	Name  string    `json:"name" gorm:"column:prd_name;size:255"`
+	Price float64   `json:"price" gorm:"column:prd_price;type:decimal(10,2)"`
+	entity.BaseModel
 }
 
 func (Product) TableName() string {
@@ -35,9 +36,7 @@ func (p *Product) Validate() error {
 
 func NewProduct(name string, price float64) (*Product, error) {
 	product := &Product{
-		IDModel: entity.IDModel{
-			ID: entity.NewID(),
-		},
+		ID:    entity.NewID(),
 		Name:  name,
 		Price: price,
 	}
