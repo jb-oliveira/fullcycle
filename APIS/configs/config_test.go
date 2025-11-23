@@ -648,7 +648,7 @@ func TestNewDB_WithoutLoadingConfig(t *testing.T) {
 	// Reset dbConfig to nil
 	dbConfig = nil
 
-	db, err := NewDB()
+	db, err := InitGorm()
 	if err == nil {
 		t.Errorf("NewDB() expected error when config not loaded, got nil")
 	}
@@ -675,7 +675,7 @@ DB_NAME=testdb`)
 		t.Fatalf("LoadDbConfig() error = %v", err)
 	}
 
-	db, err := NewDB()
+	db, err := InitGorm()
 	if err == nil {
 		t.Errorf("NewDB() expected error for unsupported driver, got nil")
 	}
@@ -715,7 +715,7 @@ DB_NAME=testdb`, tt.driver)
 				t.Fatalf("LoadDbConfig() error = %v", err)
 			}
 
-			db, err := NewDB()
+			db, err := InitGorm()
 			if tt.expectError && err == nil {
 				t.Errorf("NewDB() expected error for %s, got nil", tt.driver)
 			}
@@ -821,7 +821,7 @@ DB_NAME=myapp`)
 	}
 
 	// Try to initialize DB
-	dbInstance, err := NewDB()
+	dbInstance, err := InitGorm()
 	if err != nil {
 		// If DB connection fails, skip this test (DB might not be running)
 		t.Skipf("Skipping test: database not available: %v", err)

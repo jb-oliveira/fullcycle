@@ -2,6 +2,7 @@ package configs
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/go-chi/jwtauth"
 	"github.com/spf13/viper"
@@ -84,35 +85,27 @@ func GetWebConfig() *confWeb {
 	return webConfig
 }
 
-func NewDB() (*gorm.DB, error) {
+func InitGorm() error {
 	if dbConfig == nil {
-		return nil, fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
+		return fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
 	}
 
-	var dialector gorm.Dialector
 	dsn := buildDSN(dbConfig)
+	dialector := postgres.Open(dsn)
 
-	switch dbConfig.DBDriver {
-	case "postgres", "postgresql":
-		dialector = postgres.Open(dsn)
-	case "mysql":
-		return nil, fmt.Errorf("driver mysql não implementado: instale gorm.io/driver/mysql")
-	case "sqlite", "sqlite3":
-		return nil, fmt.Errorf("driver sqlite não implementado: instale gorm.io/driver/sqlite")
-	default:
-		return nil, fmt.Errorf("driver de banco não suportado: %s (suportados: postgres, mysql, sqlite)", dbConfig.DBDriver)
-	}
-
-	dbInstance, err := gorm.Open(dialector, &gorm.Config{})
+	var err error
+	db, err = gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("erro ao abrir conexão com banco: %w", err)
+		return fmt.Errorf("erro ao abrir conexão com banco: %w", err)
 	}
-
-	db = dbInstance
-	return db, nil
+	return nil
 }
 
 func GetDB() *gorm.DB {
+	if db == nil {
+		log.Fatalf("Banco de dados não foi inicializado!")
+		return nil
+	}
 	return db
 }
 
