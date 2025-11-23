@@ -16,18 +16,8 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	})
 	require.NoError(t, err)
 
-	// Create table manually without UUID default for SQLite compatibility
-	err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id TEXT PRIMARY KEY,
-			created_at DATETIME,
-			updated_at DATETIME,
-			deleted_at DATETIME,
-			usr_name TEXT,
-			usr_email TEXT UNIQUE,
-			usr_password TEXT
-		)
-	`).Error
+	// Use auto migration
+	err = db.AutoMigrate(&entity.User{})
 	require.NoError(t, err)
 
 	return db

@@ -8,7 +8,7 @@ import (
 type User struct {
 	entity.IDModel
 	Name     string `json:"name" gorm:"column:usr_name;size:255"`
-	Email    string `json:"email" gorm:"column:usr_email;size:255"`
+	Email    string `json:"email" gorm:"column:usr_email;size:255;unique"`
 	Password string `json:"-" gorm:"column:usr_password;size:255"`
 }
 
