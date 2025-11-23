@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-chi/jwtauth"
 	"github.com/spf13/viper"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
@@ -85,4 +87,66 @@ func GetDbConfig() *confDB {
 // GetWebConfig returns the loaded web configuration.
 func GetWebConfig() *confWeb {
 	return webConfig
+}
+
+// NewDB creates and returns a new GORM database connection using the loaded DB configuration.
+// Returns error if dbConfig is not loaded or connection fails.
+// Note: This function requires the appropriate GORM driver to be installed:
+//   - postgres: gorm.io/driver/postgres (installed)
+//   - mysql: gorm.io/driver/mysql
+//   - sqlite: gorm.io/driver/sqlite
+func NewDB() (*gorm.DB, error) {
+	if dbConfig == nil {
+		return nil, fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
+	}
+
+	var dialector gorm.Dialector
+	dsn := buildDSN(dbConfig)
+
+	switch dbConfig.DBDriver {
+	case "postgres", "postgresql":
+		dialector = postgres.Open(dsn)
+	case "mysql":
+		return nil, fmt.Errorf("mysql driver not implemented: install gorm.io/driver/mysql")
+	case "sqlite", "sqlite3":
+		return nil, fmt.Errorf("sqlite driver not implemented: install gorm.io/driver/sqlite")
+	default:
+		return nil, fmt.Errorf("unsupported database driver: %s (supported: postgres, mysql, sqlite)", dbConfig.DBDriver)
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("opening database connection: %w", err)
+	}
+
+	return db, nil
+}
+
+// buildDSN constructs a database connection string from the configuration.
+func buildDSN(config *confDB) string {
+	switch config.DBDriver {
+	case "postgres", "postgresql":
+		return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
+	case "mysql":
+		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
+	case "sqlite", "sqlite3":
+		return config.DBName // SQLite uses file path as DSN
+	default:
+		return ""
+	}
+}
+
+// GetDSN returns the database connection string for the loaded configuration.
+// Returns error if dbConfig is not loaded.
+func GetDSN() (string, error) {
+	if dbConfig == nil {
+		return "", fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
+	}
+	dsn := buildDSN(dbConfig)
+	if dsn == "" {
+		return "", fmt.Errorf("unsupported database driver: %s", dbConfig.DBDriver)
+	}
+	return dsn, nil
 }

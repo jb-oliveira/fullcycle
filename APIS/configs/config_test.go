@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -546,5 +547,235 @@ JWT_EXPIRATION=1800`,
 				t.Errorf("JWTExpiration = %v, want %v", config.JWTExpiration, tt.expectedConfig.JWTExpiration)
 			}
 		})
+	}
+}
+
+// TestGetDSN tests DSN generation for different database drivers
+func TestGetDSN(t *testing.T) {
+	tests := []struct {
+		name        string
+		envContent  string
+		expectedDSN string
+		expectError bool
+	}{
+		{
+			name: "postgres DSN",
+			envContent: `DB_DRIVER=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=testuser
+DB_PASSWORD=testpass
+DB_NAME=testdb`,
+			expectedDSN: "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=disable",
+			expectError: false,
+		},
+		{
+			name: "mysql DSN",
+			envContent: `DB_DRIVER=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=secret
+DB_NAME=mydb`,
+			expectedDSN: "root:secret@tcp(localhost:3306)/mydb?charset=utf8mb4&parseTime=True&loc=Local",
+			expectError: false,
+		},
+		{
+			name: "sqlite DSN",
+			envContent: `DB_DRIVER=sqlite
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=test.db`,
+			expectedDSN: "test.db",
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleanupViper()
+			defer cleanupViper()
+
+			tmpDir := t.TempDir()
+			createTestEnvFile(t, tmpDir, tt.envContent)
+
+			_, err := LoadDbConfig(tmpDir)
+			if err != nil {
+				t.Fatalf("LoadDbConfig() error = %v", err)
+			}
+
+			dsn, err := GetDSN()
+			if tt.expectError && err == nil {
+				t.Errorf("GetDSN() expected error, got nil")
+			}
+			if !tt.expectError && err != nil {
+				t.Errorf("GetDSN() unexpected error = %v", err)
+			}
+			if !tt.expectError && dsn != tt.expectedDSN {
+				t.Errorf("GetDSN() = %v, want %v", dsn, tt.expectedDSN)
+			}
+		})
+	}
+}
+
+// TestGetDSN_WithoutLoadingConfig tests error when config not loaded
+func TestGetDSN_WithoutLoadingConfig(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	// Reset dbConfig to nil
+	dbConfig = nil
+
+	dsn, err := GetDSN()
+	if err == nil {
+		t.Errorf("GetDSN() expected error when config not loaded, got nil")
+	}
+	if dsn != "" {
+		t.Errorf("GetDSN() expected empty string, got %v", dsn)
+	}
+}
+
+// TestNewDB_WithoutLoadingConfig tests error when config not loaded
+func TestNewDB_WithoutLoadingConfig(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	// Reset dbConfig to nil
+	dbConfig = nil
+
+	db, err := NewDB()
+	if err == nil {
+		t.Errorf("NewDB() expected error when config not loaded, got nil")
+	}
+	if db != nil {
+		t.Errorf("NewDB() expected nil db, got %v", db)
+	}
+}
+
+// TestNewDB_UnsupportedDriver tests error for unsupported drivers
+func TestNewDB_UnsupportedDriver(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	tmpDir := t.TempDir()
+	createTestEnvFile(t, tmpDir, `DB_DRIVER=mongodb
+DB_HOST=localhost
+DB_PORT=27017
+DB_USER=user
+DB_PASSWORD=pass
+DB_NAME=testdb`)
+
+	_, err := LoadDbConfig(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadDbConfig() error = %v", err)
+	}
+
+	db, err := NewDB()
+	if err == nil {
+		t.Errorf("NewDB() expected error for unsupported driver, got nil")
+	}
+	if db != nil {
+		t.Errorf("NewDB() expected nil db for unsupported driver, got %v", db)
+	}
+}
+
+// TestNewDB_DriversNotInstalled tests that appropriate errors are returned
+// when GORM drivers are not installed (or database connection fails)
+func TestNewDB_DriversNotInstalled(t *testing.T) {
+	tests := []struct {
+		driver      string
+		expectError bool
+	}{
+		{"postgres", true}, // Will fail to connect (no test DB running)
+		{"mysql", true},    // Driver not installed
+		{"sqlite", true},   // Driver not installed
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.driver, func(t *testing.T) {
+			cleanupViper()
+			defer cleanupViper()
+
+			tmpDir := t.TempDir()
+			envContent := fmt.Sprintf(`DB_DRIVER=%s
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=user
+DB_PASSWORD=pass
+DB_NAME=testdb`, tt.driver)
+			createTestEnvFile(t, tmpDir, envContent)
+
+			_, err := LoadDbConfig(tmpDir)
+			if err != nil {
+				t.Fatalf("LoadDbConfig() error = %v", err)
+			}
+
+			db, err := NewDB()
+			if tt.expectError && err == nil {
+				t.Errorf("NewDB() expected error for %s, got nil", tt.driver)
+			}
+			if tt.expectError && db != nil {
+				t.Errorf("NewDB() expected nil db, got %v", db)
+			}
+		})
+	}
+}
+
+// TestGetDbConfig_ReturnsLoadedConfig tests that GetDbConfig returns the loaded config
+func TestGetDbConfig_ReturnsLoadedConfig(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	tmpDir := t.TempDir()
+	createTestEnvFile(t, tmpDir, `DB_DRIVER=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=testuser
+DB_PASSWORD=testpass
+DB_NAME=testdb`)
+
+	config, err := LoadDbConfig(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadDbConfig() error = %v", err)
+	}
+
+	retrieved := GetDbConfig()
+	if retrieved == nil {
+		t.Fatal("GetDbConfig() returned nil")
+	}
+	if retrieved.DBDriver != config.DBDriver {
+		t.Errorf("GetDbConfig().DBDriver = %v, want %v", retrieved.DBDriver, config.DBDriver)
+	}
+	if retrieved.DBHost != config.DBHost {
+		t.Errorf("GetDbConfig().DBHost = %v, want %v", retrieved.DBHost, config.DBHost)
+	}
+}
+
+// TestGetWebConfig_ReturnsLoadedConfig tests that GetWebConfig returns the loaded config
+func TestGetWebConfig_ReturnsLoadedConfig(t *testing.T) {
+	cleanupViper()
+	defer cleanupViper()
+
+	tmpDir := t.TempDir()
+	createTestEnvFile(t, tmpDir, `WEB_PORT=8080
+JWT_SECRET=secret
+JWT_EXPIRATION=3600`)
+
+	config, err := LoadWebConfig(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadWebConfig() error = %v", err)
+	}
+
+	retrieved := GetWebConfig()
+	if retrieved == nil {
+		t.Fatal("GetWebConfig() returned nil")
+	}
+	if retrieved.WebServerPort != config.WebServerPort {
+		t.Errorf("GetWebConfig().WebServerPort = %v, want %v", retrieved.WebServerPort, config.WebServerPort)
+	}
+	if retrieved.JWTSecret != config.JWTSecret {
+		t.Errorf("GetWebConfig().JWTSecret = %v, want %v", retrieved.JWTSecret, config.JWTSecret)
 	}
 }

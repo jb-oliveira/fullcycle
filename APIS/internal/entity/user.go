@@ -23,7 +23,9 @@ func NewUser(name, email, password string) (*User, error) {
 		return nil, err
 	}
 	return &User{
-		ID:       entity.NewID(),
+		IDModel: entity.IDModel{
+			ID: entity.NewID(),
+		},
 		Name:     name,
 		Email:    email,
 		Password: string(hash),
