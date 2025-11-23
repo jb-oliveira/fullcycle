@@ -9,6 +9,7 @@ import (
 var (
 	ErrIDRequired   = errors.New("ID do produto é obrigatório e deve ser válido")
 	ErrNameRequired = errors.New("nome do produto é obrigatório")
+	ErrNameTooLong  = errors.New("nome do produto não pode exceder 255 caracteres")
 	ErrInvalidPrice = errors.New("preço do produto deve ser maior que zero")
 )
 
@@ -31,6 +32,9 @@ func (p *Product) Validate() error {
 	}
 	if p.Name == "" {
 		return ErrNameRequired
+	}
+	if len(p.Name) > 255 {
+		return ErrNameTooLong
 	}
 	if p.Price <= 0 {
 		return ErrInvalidPrice

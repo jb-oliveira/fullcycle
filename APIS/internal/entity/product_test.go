@@ -87,6 +87,11 @@ func TestNewProduct_GeneratesUniqueIDs(t *testing.T) {
 // It verifies that validation rules are correctly enforced for various
 // product configurations.
 func TestProduct_Validate(t *testing.T) {
+	name256 := string(make([]byte, 256))
+	for i := range name256 {
+		name256 = name256[:i] + "X" + name256[i+1:]
+	}
+
 	tests := []struct {
 		name        string
 		product     *Product
@@ -113,6 +118,17 @@ func TestProduct_Validate(t *testing.T) {
 				Price: 50.0,
 			},
 			expectError: ErrNameRequired,
+		},
+		{
+			name: "name too long",
+			product: &Product{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:  name256,
+				Price: 50.0,
+			},
+			expectError: ErrNameTooLong,
 		},
 		{
 			name: "zero price",
@@ -205,4 +221,54 @@ func TestProduct_Validate_WithZeroUUID(t *testing.T) {
 
 	err := product.Validate()
 	assert.Nil(t, err)
+}
+
+// TestNewProduct_WithNameAt255Characters tests that product names
+// with exactly 255 characters are accepted as valid.
+func TestNewProduct_WithNameAt255Characters(t *testing.T) {
+	name255 := string(make([]byte, 255))
+	for i := range name255 {
+		name255 = name255[:i] + "A" + name255[i+1:]
+	}
+
+	product, err := NewProduct(name255, 50.0)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, product)
+	assert.Equal(t, 255, len(product.Name))
+	assert.Equal(t, name255, product.Name)
+}
+
+// TestNewProduct_WithNameOver255Characters tests that product names
+// exceeding 255 characters are rejected by validation.
+func TestNewProduct_WithNameOver255Characters(t *testing.T) {
+	name256 := string(make([]byte, 256))
+	for i := range name256 {
+		name256 = name256[:i] + "B" + name256[i+1:]
+	}
+
+	product, err := NewProduct(name256, 50.0)
+
+	assert.ErrorIs(t, err, ErrNameTooLong)
+	assert.Nil(t, product)
+}
+
+// TestNewProduct_WithMaxDecimalPrice tests that prices with 2 decimal places
+// are handled correctly, matching the DECIMAL(10,2) database constraint.
+func TestNewProduct_WithMaxDecimalPrice(t *testing.T) {
+	product, err := NewProduct("Max Price Product", 99999999.99)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, product)
+	assert.Equal(t, 99999999.99, product.Price)
+}
+
+// TestNewProduct_WithThreeDecimalPlaces tests that prices with more than
+// 2 decimal places are accepted by the application (database will round).
+func TestNewProduct_WithThreeDecimalPlaces(t *testing.T) {
+	product, err := NewProduct("Product", 19.999)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, product)
+	assert.Equal(t, 19.999, product.Price)
 }

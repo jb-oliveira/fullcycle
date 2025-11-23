@@ -3,6 +3,7 @@ package entity
 import (
 	"testing"
 
+	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,14 +62,13 @@ func TestUser_ValidatePassword_EmptyPassword(t *testing.T) {
 	assert.False(t, user.ValidatePassword(""), "Should reject empty password")
 }
 
-// TestNewUser_EmptyPassword verifies that even empty passwords are hashed
-// rather than stored as empty strings, maintaining consistent security behavior.
+// TestNewUser_EmptyPassword verifies that empty passwords are rejected
+// by validation, ensuring security requirements.
 func TestNewUser_EmptyPassword(t *testing.T) {
 	user, err := NewUser("Test User", "test@example.com", "")
 
-	assert.Nil(t, err)
-	assert.NotNil(t, user)
-	assert.NotEmpty(t, user.Password, "Even empty password should be hashed")
+	assert.ErrorIs(t, err, ErrPasswordRequired)
+	assert.Nil(t, user)
 }
 
 // TestNewUser_SpecialCharactersInPassword tests that passwords containing
@@ -90,4 +90,253 @@ func TestNewUser_UniqueIDs(t *testing.T) {
 	assert.Nil(t, err1)
 	assert.Nil(t, err2)
 	assert.NotEqual(t, user1.ID, user2.ID, "Each user should have a unique ID")
+}
+
+// TestNewUser_ValidatesFields tests the validation logic in NewUser.
+// It uses table-driven tests to verify that validation errors are returned
+// for invalid inputs (empty name, empty email, empty password, fields too long).
+func TestNewUser_ValidatesFields(t *testing.T) {
+	name256 := string(make([]byte, 256))
+	for i := range name256 {
+		name256 = name256[:i] + "A" + name256[i+1:]
+	}
+
+	email256 := string(make([]byte, 256))
+	for i := range email256 {
+		email256 = email256[:i] + "B" + email256[i+1:]
+	}
+
+	password256 := string(make([]byte, 256))
+	for i := range password256 {
+		password256 = password256[:i] + "C" + password256[i+1:]
+	}
+
+	tests := []struct {
+		name        string
+		userName    string
+		email       string
+		password    string
+		expectError error
+	}{
+		{
+			name:        "valid user",
+			userName:    "John Doe",
+			email:       "john@example.com",
+			password:    "password123",
+			expectError: nil,
+		},
+		{
+			name:        "empty name",
+			userName:    "",
+			email:       "john@example.com",
+			password:    "password123",
+			expectError: ErrUserNameRequired,
+		},
+		{
+			name:        "name too long",
+			userName:    name256,
+			email:       "john@example.com",
+			password:    "password123",
+			expectError: ErrUserNameTooLong,
+		},
+		{
+			name:        "empty email",
+			userName:    "John Doe",
+			email:       "",
+			password:    "password123",
+			expectError: ErrUserEmailRequired,
+		},
+		{
+			name:        "email too long",
+			userName:    "John Doe",
+			email:       email256,
+			password:    "password123",
+			expectError: ErrUserEmailTooLong,
+		},
+		{
+			name:        "empty password",
+			userName:    "John Doe",
+			email:       "john@example.com",
+			password:    "",
+			expectError: ErrPasswordRequired,
+		},
+		{
+			name:        "password too long",
+			userName:    "John Doe",
+			email:       "john@example.com",
+			password:    password256,
+			expectError: ErrPasswordTooLong,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			user, err := NewUser(tt.userName, tt.email, tt.password)
+
+			if tt.expectError != nil {
+				assert.ErrorIs(t, err, tt.expectError)
+				assert.Nil(t, user)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, user)
+				assert.Equal(t, tt.userName, user.Name)
+				assert.Equal(t, tt.email, user.Email)
+			}
+		})
+	}
+}
+
+// TestUser_Validate tests the Validate method directly on User instances.
+// It verifies that validation rules are correctly enforced for various
+// user configurations.
+func TestUser_Validate(t *testing.T) {
+	name256 := string(make([]byte, 256))
+	for i := range name256 {
+		name256 = name256[:i] + "X" + name256[i+1:]
+	}
+
+	email256 := string(make([]byte, 256))
+	for i := range email256 {
+		email256 = email256[:i] + "Y" + email256[i+1:]
+	}
+
+	password256 := string(make([]byte, 256))
+	for i := range password256 {
+		password256 = password256[:i] + "Z" + password256[i+1:]
+	}
+
+	tests := []struct {
+		name        string
+		user        *User
+		expectError error
+	}{
+		{
+			name: "valid user",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "Valid User",
+				Email:    "valid@example.com",
+				Password: "hashedpassword",
+			},
+			expectError: nil,
+		},
+		{
+			name: "empty name",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "",
+				Email:    "user@example.com",
+				Password: "hashedpassword",
+			},
+			expectError: ErrUserNameRequired,
+		},
+		{
+			name: "name too long",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     name256,
+				Email:    "user@example.com",
+				Password: "hashedpassword",
+			},
+			expectError: ErrUserNameTooLong,
+		},
+		{
+			name: "empty email",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "User Name",
+				Email:    "",
+				Password: "hashedpassword",
+			},
+			expectError: ErrUserEmailRequired,
+		},
+		{
+			name: "email too long",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "User Name",
+				Email:    email256,
+				Password: "hashedpassword",
+			},
+			expectError: ErrUserEmailTooLong,
+		},
+		{
+			name: "empty password",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "User Name",
+				Email:    "user@example.com",
+				Password: "",
+			},
+			expectError: ErrPasswordRequired,
+		},
+		{
+			name: "password too long",
+			user: &User{
+				IDModel: entity.IDModel{
+					ID: entity.NewID(),
+				},
+				Name:     "User Name",
+				Email:    "user@example.com",
+				Password: password256,
+			},
+			expectError: ErrPasswordTooLong,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.user.Validate()
+
+			if tt.expectError != nil {
+				assert.ErrorIs(t, err, tt.expectError)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
+}
+
+// TestNewUser_WithNameAt255Characters tests that user names
+// with exactly 255 characters are accepted as valid.
+func TestNewUser_WithNameAt255Characters(t *testing.T) {
+	name255 := string(make([]byte, 255))
+	for i := range name255 {
+		name255 = name255[:i] + "A" + name255[i+1:]
+	}
+
+	user, err := NewUser(name255, "user@example.com", "password123")
+
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, 255, len(user.Name))
+	assert.Equal(t, name255, user.Name)
+}
+
+// TestNewUser_WithEmailAt255Characters tests that user emails
+// with exactly 255 characters are accepted as valid.
+func TestNewUser_WithEmailAt255Characters(t *testing.T) {
+	email255 := string(make([]byte, 255))
+	for i := range email255 {
+		email255 = email255[:i] + "B" + email255[i+1:]
+	}
+
+	user, err := NewUser("John Doe", email255, "password123")
+
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, 255, len(user.Email))
+	assert.Equal(t, email255, user.Email)
 }
