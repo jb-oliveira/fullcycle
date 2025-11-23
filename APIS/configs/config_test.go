@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// createTestEnvFile is a helper function that creates a temporary .env file
+// with the given content for testing purposes.
 func createTestEnvFile(t *testing.T, dir string, content string) string {
 	t.Helper()
 	envPath := filepath.Join(dir, ".env")
@@ -19,6 +21,8 @@ func createTestEnvFile(t *testing.T, dir string, content string) string {
 	return envPath
 }
 
+// cleanupViper resets Viper state and clears all environment variables
+// that might interfere with tests, ensuring test isolation.
 func cleanupViper() {
 	viper.Reset()
 	os.Unsetenv("DB_DRIVER")
@@ -32,6 +36,9 @@ func cleanupViper() {
 	os.Unsetenv("JWT_EXPIRATION")
 }
 
+// TestLoadDbConfig tests loading database configuration with valid inputs.
+// It uses table-driven tests to verify that all configuration fields are
+// correctly populated from .env files with various content scenarios.
 func TestLoadDbConfig(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -43,50 +50,50 @@ func TestLoadDbConfig(t *testing.T) {
 			envContent: `DB_DRIVER=postgres
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=usuario_teste
-DB_PASSWORD=senha_teste
-DB_NAME=banco_teste`,
+DB_USER=testuser
+DB_PASSWORD=testpass
+DB_NAME=testdb`,
 			expectedConfig: &confDB{
 				DBDriver:   "postgres",
 				DBHost:     "localhost",
 				DBPort:     "5432",
-				DBUser:     "usuario_teste",
-				DBPassword: "senha_teste",
-				DBName:     "banco_teste",
+				DBUser:     "testuser",
+				DBPassword: "testpass",
+				DBName:     "testdb",
 			},
 		},
 		{
 			name: "config with special characters",
 			envContent: `DB_DRIVER=mysql
-DB_HOST=bd.exemplo.com
+DB_HOST=db.example.com
 DB_PORT=3306
-DB_USER=usuario@dominio
-DB_PASSWORD="s3nh@!#123"
-DB_NAME=meu-banco`,
+DB_USER=user@domain
+DB_PASSWORD="p@ss!w0rd#123"
+DB_NAME=my-database`,
 			expectedConfig: &confDB{
 				DBDriver:   "mysql",
-				DBHost:     "bd.exemplo.com",
+				DBHost:     "db.example.com",
 				DBPort:     "3306",
-				DBUser:     "usuario@dominio",
-				DBPassword: "s3nh@!#123",
-				DBName:     "meu-banco",
+				DBUser:     "user@domain",
+				DBPassword: "p@ss!w0rd#123",
+				DBName:     "my-database",
 			},
 		},
 		{
 			name: "config with spaces in values",
 			envContent: `DB_DRIVER=sqlite
-DB_HOST=host local
+DB_HOST=local host
 DB_PORT=0
-DB_USER=usuario teste
-DB_PASSWORD=senha teste
-DB_NAME=banco teste`,
+DB_USER=test user
+DB_PASSWORD=test pass
+DB_NAME=test db`,
 			expectedConfig: &confDB{
 				DBDriver:   "sqlite",
-				DBHost:     "host local",
+				DBHost:     "local host",
 				DBPort:     "0",
-				DBUser:     "usuario teste",
-				DBPassword: "senha teste",
-				DBName:     "banco teste",
+				DBUser:     "test user",
+				DBPassword: "test pass",
+				DBName:     "test db",
 			},
 		},
 	}
