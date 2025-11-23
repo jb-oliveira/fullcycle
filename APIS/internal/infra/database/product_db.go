@@ -68,3 +68,10 @@ func (p *Product) Delete(id string) error {
 	_, err = gorm.G[entity.Product](p.db).Where("id = ?", productID).Delete(ctx)
 	return err
 }
+
+func (p *Product) Count() (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
+	defer cancel()
+
+	return gorm.G[entity.Product](p.db).Count(ctx, "id")
+}

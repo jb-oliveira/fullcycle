@@ -266,3 +266,76 @@ func TestProduct_Delete(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestProduct_Count(t *testing.T) {
+	t.Run("should return zero when no products exist", func(t *testing.T) {
+		db := setupProductTestDB(t)
+		productDB := NewProduct(db)
+
+		count, err := productDB.Count()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), count)
+	})
+
+	t.Run("should return correct count with products", func(t *testing.T) {
+		db := setupProductTestDB(t)
+		productDB := NewProduct(db)
+
+		// Create test products
+		for i := 1; i <= 5; i++ {
+			product, err := entity.NewProduct("Product", 10.00)
+			require.NoError(t, err)
+			err = productDB.Create(product)
+			require.NoError(t, err)
+		}
+
+		count, err := productDB.Count()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(5), count)
+	})
+
+	t.Run("should not count deleted products", func(t *testing.T) {
+		db := setupProductTestDB(t)
+		productDB := NewProduct(db)
+
+		// Create products
+		product1, _ := entity.NewProduct("Product 1", 10.00)
+		product2, _ := entity.NewProduct("Product 2", 20.00)
+		product3, _ := entity.NewProduct("Product 3", 30.00)
+
+		productDB.Create(product1)
+		productDB.Create(product2)
+		productDB.Create(product3)
+
+		// Delete one product
+		err := productDB.Delete(product2.ID.String())
+		require.NoError(t, err)
+
+		// Count should be 2 (soft delete)
+		count, err := productDB.Count()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(2), count)
+	})
+
+	t.Run("should return count after updates", func(t *testing.T) {
+		db := setupProductTestDB(t)
+		productDB := NewProduct(db)
+
+		// Create product
+		product, err := entity.NewProduct("Original", 50.00)
+		require.NoError(t, err)
+		err = productDB.Create(product)
+		require.NoError(t, err)
+
+		// Update product
+		product.Name = "Updated"
+		product.Price = 75.00
+		err = productDB.Update(product)
+		require.NoError(t, err)
+
+		// Count should still be 1
+		count, err := productDB.Count()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(1), count)
+	})
+}

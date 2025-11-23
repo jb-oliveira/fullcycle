@@ -13,4 +13,5 @@ type ProductInterface interface {
 	FindByID(id string) (*entity.Product, error)
 	Update(product *entity.Product) error
 	Delete(id string) error
+	Count() (int64, error)
 }
