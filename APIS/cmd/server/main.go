@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/configs"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
@@ -23,8 +25,11 @@ func main() {
 	productDB := database.NewProductDB(configs.GetDB())
 	productHandler := handlers.ProductHandler{ProductDB: productDB}
 
-	http.HandleFunc("/products", productHandler.CreateProduct)
-	http.ListenAndServe(":8000", nil)
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Post("/products", productHandler.CreateProduct)
+
+	http.ListenAndServe(":8000", r)
 }
 
 func initDB() {
