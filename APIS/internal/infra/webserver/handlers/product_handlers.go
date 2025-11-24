@@ -16,6 +16,10 @@ type ProductHandler struct {
 	productDB database.ProductInterface
 }
 
+func NewProductHandler(db database.ProductInterface) *ProductHandler {
+	return &ProductHandler{productDB: db}
+}
+
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var productDTO dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&productDTO)
@@ -35,10 +39,6 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-}
-
-func NewProductHandler(db database.ProductInterface) *ProductHandler {
-	return &ProductHandler{productDB: db}
 }
 
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {

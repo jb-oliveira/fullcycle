@@ -34,9 +34,10 @@ func main() {
 	r.Get("/products", productHandler.GetProducts)
 
 	userDB := database.NewUserDB(configs.GetDB())
-	userHandler := handlers.NewUserHandler(userDB)
+	userHandler := handlers.NewUserHandler(userDB, configs.GetWebConfig().TokenAuth, configs.GetWebConfig().JWTExpiration)
 
 	r.Post("/users", userHandler.CreateUser)
+	r.Post("/users/auth", userHandler.Auth)
 
 	http.ListenAndServe(":8000", r)
 }
