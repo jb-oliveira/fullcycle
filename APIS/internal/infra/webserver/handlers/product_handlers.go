@@ -8,6 +8,7 @@ import (
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
+	entityPkg "github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
 )
 
 type ProductHandler struct {
@@ -58,4 +59,42 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		Price: product.Price,
 	}
 	json.NewEncoder(w).Encode(dto)
+}
+
+func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	// adquire o id
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	_, err := entityPkg.ParseID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// deserializa
+	var productDTO dto.UpdateProductInput
+	err = json.NewDecoder(r.Body).Decode(&productDTO)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// carrega o produto
+	product, err := h.ProductDB.FindByID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	// salva o produto
+	product.Name = productDTO.Name
+	product.Price = productDTO.Price
+	err = h.ProductDB.Update(product)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// Retorna o produto
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
