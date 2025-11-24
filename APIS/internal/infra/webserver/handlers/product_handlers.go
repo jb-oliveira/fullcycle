@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
@@ -97,4 +98,74 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	// Retorna o produto
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	_, err := entityPkg.ParseID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	product, err := h.ProductDB.FindByID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	err = h.ProductDB.Delete(product.ID.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
+	page := r.URL.Query().Get("page")
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		pageInt = 1
+	}
+	limit := r.URL.Query().Get("limit")
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil {
+		limitInt = 10
+	}
+	sort := r.URL.Query().Get("sort")
+	sortDirection := r.URL.Query().Get("sort_direction")
+	products, err := h.ProductDB.FindAll(pageInt, limitInt, sort, sortDirection)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	dtos := []dto.ProductOutput{}
+	for _, product := range products {
+		dtos = append(dtos, dto.ProductOutput{
+			ID:    product.ID.String(),
+			Name:  product.Name,
+			Price: product.Price,
+		})
+	}
+	count, err := h.ProductDB.Count()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	result := dto.ProductListOutput{
+		Products: dtos,
+		Page:     pageInt,
+		Limit:    limitInt,
+		Total:    int(count),
+	}
+	if sort != "" {
+		result.Sort = sort
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
 }

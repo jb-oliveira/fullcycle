@@ -25,5 +25,6 @@ type ProductListOutput struct {
 	Products []ProductOutput `json:"products"`
 	Page     int             `json:"page"`
 	Limit    int             `json:"limit"`
+	Sort     string          `json:"sort"`
 	Total    int             `json:"total"`
 }
