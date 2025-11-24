@@ -13,7 +13,7 @@ import (
 )
 
 type ProductHandler struct {
-	ProductDB database.ProductInterface
+	productDB database.ProductInterface
 }
 
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +29,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = h.ProductDB.Create(p)
+	err = h.productDB.Create(p)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -38,7 +38,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewProductHandler(db database.ProductInterface) *ProductHandler {
-	return &ProductHandler{ProductDB: db}
+	return &ProductHandler{productDB: db}
 }
 
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +47,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	product, err := h.ProductDB.FindByID(id)
+	product, err := h.productDB.FindByID(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -82,7 +82,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// carrega o produto
-	product, err := h.ProductDB.FindByID(id)
+	product, err := h.productDB.FindByID(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -90,7 +90,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	// salva o produto
 	product.Name = productDTO.Name
 	product.Price = productDTO.Price
-	err = h.ProductDB.Update(product)
+	err = h.productDB.Update(product)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -111,12 +111,12 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	product, err := h.ProductDB.FindByID(id)
+	product, err := h.productDB.FindByID(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	err = h.ProductDB.Delete(product.ID.String())
+	err = h.productDB.Delete(product.ID.String())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -138,7 +138,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	sort := r.URL.Query().Get("sort")
 	sortDirection := r.URL.Query().Get("sort_direction")
-	products, err := h.ProductDB.FindAll(pageInt, limitInt, sort, sortDirection)
+	products, err := h.productDB.FindAll(pageInt, limitInt, sort, sortDirection)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -151,7 +151,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 			Price: product.Price,
 		})
 	}
-	count, err := h.ProductDB.Count()
+	count, err := h.productDB.Count()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

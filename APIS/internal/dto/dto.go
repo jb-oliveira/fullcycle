@@ -28,3 +28,20 @@ type ProductListOutput struct {
 	Sort     string          `json:"sort"`
 	Total    int             `json:"total"`
 }
+
+type CreateUserInput struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type UserOutput struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+type LoginInput struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}

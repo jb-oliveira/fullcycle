@@ -23,7 +23,7 @@ func main() {
 	log.Println("Configuração carregada com sucesso")
 
 	productDB := database.NewProductDB(configs.GetDB())
-	productHandler := handlers.ProductHandler{ProductDB: productDB}
+	productHandler := handlers.NewProductHandler(productDB)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -32,6 +32,11 @@ func main() {
 	r.Put("/products/{id}", productHandler.UpdateProduct)
 	r.Delete("/products/{id}", productHandler.DeleteProduct)
 	r.Get("/products", productHandler.GetProducts)
+
+	userDB := database.NewUserDB(configs.GetDB())
+	userHandler := handlers.NewUserHandler(userDB)
+
+	r.Post("/users", userHandler.CreateUser)
 
 	http.ListenAndServe(":8000", r)
 }
