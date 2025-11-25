@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/configs"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
@@ -27,11 +28,16 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Post("/products", productHandler.CreateProduct)
-	r.Get("/products/{id}", productHandler.GetProduct)
-	r.Put("/products/{id}", productHandler.UpdateProduct)
-	r.Delete("/products/{id}", productHandler.DeleteProduct)
-	r.Get("/products", productHandler.GetProducts)
+	r.Route("/products", func(r chi.Router) {
+		r.Use(jwtauth.Verifier(configs.GetWebConfig().TokenAuth))
+		r.Use(jwtauth.Authenticator)
+
+		r.Post("/", productHandler.CreateProduct)
+		r.Get("/{id}", productHandler.GetProduct)
+		r.Put("/{id}", productHandler.UpdateProduct)
+		r.Delete("/{id}", productHandler.DeleteProduct)
+		r.Get("/", productHandler.GetProducts)
+	})
 
 	userDB := database.NewUserDB(configs.GetDB())
 	userHandler := handlers.NewUserHandler(userDB, configs.GetWebConfig().TokenAuth, configs.GetWebConfig().JWTExpiration)

@@ -10,6 +10,7 @@ Content-Type: "application/json"
 ###
 GET http://localhost:8000/products/019ab2c7-1f33-7aee-bb61-92b86b9356e1 HTTP/1.1
 Content-Type: "application/json"
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWwiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsImV4cCI6MTc2NDE5MDA2MSwic3ViIjoiMDE5YWI3YjItMjZiZi03ZjJlLWIxYzItMzIwMjQ4ZDdiNzk2In0.5yyuIazkiSeXnlOM3AFDp9WgIcVmrUcEXZSOpIK4mb0
 
 ###
 PUT http://localhost:8000/products/019ab2c7-1f33-7aee-bb61-92b86b9356e1 HTTP/1.1
@@ -32,3 +33,4 @@ Content-Type: "application/json"
 ###
 GET http://localhost:8000/products HTTP/1.1
 Content-Type: "application/json"
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWwiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsImV4cCI6MTc2NDEwNTkwNiwic3ViIjoiMDE5YWI3YjItMjZiZi03ZjJlLWIxYzItMzIwMjQ4ZDdiNzk2In0.-5EPsy2GZzvbPTRyTbEb88yDQku7mTIF8SRxesC3X98

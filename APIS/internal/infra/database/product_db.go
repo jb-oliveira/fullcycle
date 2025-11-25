@@ -24,23 +24,9 @@ func (p *Product) Create(product *entity.Product) error {
 	return gorm.G[entity.Product](p.db).Create(ctx, product)
 }
 
-func (p *Product) FindAll(page, limit int, sort, sortDir string) ([]entity.Product, error) {
+func (p *Product) FindAll(page, limit int, sort string) ([]entity.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*10)
 	defer cancel()
-
-	sorts := make(map[string]string)
-	sorts["id"] = "prd_id"
-	sorts["name"] = "prd_name"
-	sorts["price"] = "prd_price"
-	sort = sorts[sort]
-	if sort == "" {
-		sort = "prd_id"
-	}
-	if sortDir == "desc" {
-		sort = sort + " desc"
-	} else {
-		sort = sort + " asc"
-	}
 	offset := (page - 1) * limit
 	return gorm.G[entity.Product](p.db).
 		Order(sort).

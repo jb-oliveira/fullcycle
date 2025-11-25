@@ -137,8 +137,22 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		limitInt = 10
 	}
 	sort := r.URL.Query().Get("sort")
-	sortDirection := r.URL.Query().Get("sort_direction")
-	products, err := h.productDB.FindAll(pageInt, limitInt, sort, sortDirection)
+	sortDir := r.URL.Query().Get("sort_direction")
+	sorts := make(map[string]string)
+	sorts["id"] = "prd_id"
+	sorts["name"] = "prd_name"
+	sorts["price"] = "prd_price"
+	sortComplete := sorts[sort]
+	if sortComplete == "" {
+		sortComplete = "prd_id"
+	}
+	if sortDir == "desc" {
+		sortComplete = sortComplete + " desc"
+	} else {
+		sortDir = "asc"
+		sortComplete = sortComplete + " " + sortDir
+	}
+	products, err := h.productDB.FindAll(pageInt, limitInt, sortComplete)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -156,15 +170,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	result := dto.ProductListOutput{
-		Products: dtos,
-		Page:     pageInt,
-		Limit:    limitInt,
-		Total:    int(count),
-	}
-	if sort != "" {
-		result.Sort = sort
-	}
+	result := entityPkg.NewPage(dtos, pageInt, limitInt, int(count), sort, sortDir)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
