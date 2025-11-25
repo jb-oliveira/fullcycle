@@ -2,10 +2,11 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httplog/v2"
 	"github.com/go-chi/jwtauth"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/configs"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
@@ -27,7 +28,14 @@ func main() {
 	productHandler := handlers.NewProductHandler(productDB)
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	logger := httplog.NewLogger("fullcycle-api", httplog.Options{
+		JSON:     true, // Structured JSON for prod
+		LogLevel: slog.LevelInfo,
+		Concise:  true, // Clean logs with fewer details
+	})
+	r.Use(httplog.RequestLogger(logger))
+	// r.Use(middleware.Logger)
+	r.Use(MiddlewareVazio)
 	r.Route("/products", func(r chi.Router) {
 		r.Use(jwtauth.Verifier(configs.GetWebConfig().TokenAuth))
 		r.Use(jwtauth.Authenticator)
@@ -67,4 +75,11 @@ func initDB() {
 	db.AutoMigrate(&entity.Product{}, &entity.User{})
 
 	log.Println("Conexão com banco estabelecida")
+}
+
+func MiddlewareVazio(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// log.Printf("Request: %s %s", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }
