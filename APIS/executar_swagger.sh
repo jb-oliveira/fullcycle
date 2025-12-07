@@ -5,4 +5,4 @@
 
 # Inicialização
 # swag init --parseDependency --dir ./ --output ./docs # gerado pelo kiro
-# swag init -g cmd/server/main.go # curso
+swag init -g cmd/server/main.go # curso

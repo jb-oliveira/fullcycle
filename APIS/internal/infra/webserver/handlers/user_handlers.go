@@ -25,22 +25,35 @@ func NewUserHandler(userDB database.UserInterface, jwtAuth *jwtauth.JWTAuth, exp
 	}
 }
 
+// Auth godoc
+// @Summary      Authenticate user
+// @Description  Authenticate user with email and password and return JWT token
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.LoginInput true "User login credentials"
+// @Success      200 {object} object{access_token=string} "Authentication successful"
+// @Failure      400 {string} string "Invalid request body"
+// @Failure      401 {string} string "Invalid credentials"
+// @Failure      404 {string} string "User not found"
+// @Failure      500 {string} string "Failed to generate token"
+// @Router       /users/auth [post]
 func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	userLogin := &dto.LoginInput{}
 	err := json.NewDecoder(r.Body).Decode(userLogin)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.userDB.FindByEmail(userLogin.Email)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
 	if !user.ValidatePassword(userLogin.Password) {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
@@ -54,7 +67,7 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 		"exp": time.Now().Add(time.Second * time.Duration(h.jwtExpiration)).Unix(),
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
 		return
 	}
 
@@ -65,21 +78,36 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(accessToken)
 }
 
+// Create User godoc
+// @Summary      Create a new user
+// @Description  Create a new user with name, email and password
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body dto.CreateUserInput true "User creation data"
+// @Success      201 {object} dto.UserOutput "User created successfully"
+// @Failure      400 {string} string "Invalid request body or validation error"
+// @Failure      500 {string} string "Failed to create user"
+// @Router       /users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	inserInput := dto.CreateUserInput{}
-	json.NewDecoder(r.Body).Decode(&inserInput)
+	err := json.NewDecoder(r.Body).Decode(&inserInput)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
 	user, err := entity.NewUser(inserInput.Name, inserInput.Email, inserInput.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	err = h.userDB.Create(user)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(dto.UserOutput{
 		ID:    user.ID.String(),
 		Name:  user.Name,
