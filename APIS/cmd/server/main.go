@@ -12,8 +12,29 @@ import (
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/webserver/handlers"
+
+	_ "github.com/jb-oliveira/fullcycle/tree/main/APIS/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           FullCycle API
+// @version         1.0
+// @description     This is a sample API for FullCycle course
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8000
+// @BasePath  /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	// Inicializa o banco
 	initDB()
@@ -52,6 +73,8 @@ func main() {
 
 	r.Post("/users", userHandler.CreateUser)
 	r.Post("/users/auth", userHandler.Auth)
+
+	r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8000/docs/doc.json")))
 
 	http.ListenAndServe(":8000", r)
 }

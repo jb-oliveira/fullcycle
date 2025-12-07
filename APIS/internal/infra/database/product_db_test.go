@@ -130,14 +130,14 @@ func TestProduct_FindAll(t *testing.T) {
 		}
 
 		// Test first page
-		result, err := productDB.FindAll(1, 2, "prd_name", "ASC")
+		result, err := productDB.FindAll(1, 2, "prd_name asc")
 		assert.NoError(t, err)
 		assert.Len(t, result, 2)
 		assert.Equal(t, "Product A", result[0].Name)
 		assert.Equal(t, "Product B", result[1].Name)
 
 		// Test second page
-		result, err = productDB.FindAll(2, 2, "prd_name", "ASC")
+		result, err = productDB.FindAll(2, 2, "prd_name asc")
 		assert.NoError(t, err)
 		assert.Len(t, result, 2)
 		assert.Equal(t, "Product C", result[0].Name)
@@ -148,7 +148,7 @@ func TestProduct_FindAll(t *testing.T) {
 		db := setupProductTestDB(t)
 		productDB := NewProductDB(db)
 
-		result, err := productDB.FindAll(1, 10, "prd_name", "ASC")
+		result, err := productDB.FindAll(1, 10, "prd_name asc")
 		assert.NoError(t, err)
 		assert.Empty(t, result)
 	})
@@ -165,7 +165,7 @@ func TestProduct_FindAll(t *testing.T) {
 		productDB.Create(product2)
 		productDB.Create(product3)
 
-		result, err := productDB.FindAll(1, 10, "prd_price", "DESC")
+		result, err := productDB.FindAll(1, 10, "prd_price desc")
 		assert.NoError(t, err)
 		assert.Len(t, result, 3)
 		assert.Equal(t, "Expensive", result[0].Name)
