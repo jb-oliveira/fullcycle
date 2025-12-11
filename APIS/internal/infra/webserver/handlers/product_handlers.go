@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -20,36 +21,53 @@ func NewProductHandler(db database.ProductInterface) *ProductHandler {
 	return &ProductHandler{productDB: db}
 }
 
+// @Summary Create a new product
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param product body dto.CreateProductInput true "Product to create"
+// @Success 201 {object} dto.ProductOutput
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var productDTO dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&productDTO)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
 	// Deveria ser pelo Caso de Uso, mas por enquanto ta indo direto mesmo
 	p, err := entity.NewProduct(productDTO.Name, productDTO.Price)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	err = h.productDB.Create(p)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
 }
 
+// @Summary Get a product by ID
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID"
+// @Success 200 {object} dto.ProductOutput
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("invalid id"), http.StatusBadRequest)
 		return
 	}
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -62,29 +80,39 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(dto)
 }
 
+// @Summary Update a product
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID"
+// @Param product body dto.UpdateProductInput true "Product to update"
+// @Success 200 {object} dto.ProductOutput
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	// adquire o id
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("id is required"), http.StatusBadRequest)
 		return
 	}
 	_, err := entityPkg.ParseID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	// deserializa
 	var productDTO dto.UpdateProductInput
 	err = json.NewDecoder(r.Body).Decode(&productDTO)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
 	// carrega o produto
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
 	// salva o produto
@@ -92,7 +120,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	product.Price = productDTO.Price
 	err = h.productDB.Update(product)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	// Retorna o produto
@@ -100,31 +128,51 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// @Summary Delete a product
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID"
+// @Success 204
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("id is required"), http.StatusBadRequest)
 		return
 	}
 	_, err := entityPkg.ParseID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
 	err = h.productDB.Delete(product.ID.String())
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary Get all products
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param sort query string false "Sort by"
+// @Param sort_direction query string false "Sort direction"
+// @Success 200 {object} dto.ProductOutput
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	page := r.URL.Query().Get("page")
 	pageInt, err := strconv.Atoi(page)
@@ -154,7 +202,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	products, err := h.productDB.FindAll(pageInt, limitInt, sortComplete)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	dtos := []dto.ProductOutput{}
@@ -167,7 +215,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	count, err := h.productDB.Count()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	result := entityPkg.NewPage(dtos, pageInt, limitInt, int(count), sort, sortDir)

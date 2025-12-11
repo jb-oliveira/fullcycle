@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -42,18 +43,18 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	userLogin := &dto.LoginInput{}
 	err := json.NewDecoder(r.Body).Decode(userLogin)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("Invalid request body"), http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.userDB.FindByEmail(userLogin.Email)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		ReturnHttpError(w, errors.New("User not found"), http.StatusNotFound)
 		return
 	}
 
 	if !user.ValidatePassword(userLogin.Password) {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		ReturnHttpError(w, errors.New("Invalid credentials"), http.StatusUnauthorized)
 		return
 	}
 
@@ -67,7 +68,7 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 		"exp": time.Now().Add(time.Second * time.Duration(h.jwtExpiration)).Unix(),
 	})
 	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		ReturnHttpError(w, errors.New("Failed to generate token"), http.StatusInternalServerError)
 		return
 	}
 
@@ -93,17 +94,17 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	inserInput := dto.CreateUserInput{}
 	err := json.NewDecoder(r.Body).Decode(&inserInput)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		ReturnHttpError(w, errors.New("Invalid request body"), http.StatusBadRequest)
 		return
 	}
 	user, err := entity.NewUser(inserInput.Name, inserInput.Email, inserInput.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	err = h.userDB.Create(user)
 	if err != nil {
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		ReturnHttpError(w, errors.New("Failed to create user"), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
