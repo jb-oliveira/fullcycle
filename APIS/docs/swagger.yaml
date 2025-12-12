@@ -121,6 +121,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get all products
       tags:
       - Products
@@ -150,6 +152,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create a new product
       tags:
       - Products
@@ -181,6 +185,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a product
       tags:
       - Products
@@ -213,6 +219,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get a product by ID
       tags:
       - Products
@@ -251,6 +259,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Update a product
       tags:
       - Products
@@ -274,13 +284,13 @@ paths:
           schema:
             $ref: '#/definitions/dto.UserOutput'
         "400":
-          description: Invalid request body or validation error
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Failed to create user
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Create a new user
       tags:
       - users
@@ -307,21 +317,21 @@ paths:
                 type: string
             type: object
         "400":
-          description: Invalid request body
+          description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
-          description: Invalid credentials
+          description: Unauthorized
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: User not found
+          description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Failed to generate token
+          description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Authenticate user
       tags:
       - users

@@ -34,10 +34,10 @@ func NewUserHandler(userDB database.UserInterface, jwtAuth *jwtauth.JWTAuth, exp
 // @Produce      json
 // @Param        request body dto.LoginInput true "User login credentials"
 // @Success      200 {object} object{access_token=string} "Authentication successful"
-// @Failure      400 {string} string "Invalid request body"
-// @Failure      401 {string} string "Invalid credentials"
-// @Failure      404 {string} string "User not found"
-// @Failure      500 {string} string "Failed to generate token"
+// @Failure      400 {object} dto.ErrorResponse
+// @Failure      401 {object} dto.ErrorResponse
+// @Failure      404 {object} dto.ErrorResponse
+// @Failure      500 {object} dto.ErrorResponse
 // @Router       /users/auth [post]
 func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	userLogin := &dto.LoginInput{}
@@ -87,8 +87,8 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        request body dto.CreateUserInput true "User creation data"
 // @Success      201 {object} dto.UserOutput "User created successfully"
-// @Failure      400 {string} string "Invalid request body or validation error"
-// @Failure      500 {string} string "Failed to create user"
+// @Failure      400 {object} dto.ErrorResponse
+// @Failure      500 {object} dto.ErrorResponse
 // @Router       /users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	inserInput := dto.CreateUserInput{}
