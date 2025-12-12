@@ -1,7 +1,23 @@
 package handlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
 
-func ReturnHttpError(w http.ResponseWriter, error error, code int) {
-	http.Error(w, error.Error(), code)
+	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
+)
+
+func ReturnHttpError(w http.ResponseWriter, err error, code int) {
+	ReturnHttpErrors(w, []error{err}, code)
+}
+
+func ReturnHttpErrors(w http.ResponseWriter, errors []error, code int) {
+	var messages []string
+	for _, err := range errors {
+		messages = append(messages, err.Error())
+	}
+	json.NewEncoder(w).Encode(dto.ErrorResponse{
+		Messages: messages,
+		Code:     code,
+	})
 }

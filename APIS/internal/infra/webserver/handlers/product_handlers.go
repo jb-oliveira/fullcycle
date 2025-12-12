@@ -21,7 +21,9 @@ func NewProductHandler(db database.ProductInterface) *ProductHandler {
 	return &ProductHandler{productDB: db}
 }
 
+// Create Product Godoc
 // @Summary Create a new product
+// @Description Create a new product
 // @Tags Products
 // @Accept json
 // @Produce json
@@ -29,6 +31,7 @@ func NewProductHandler(db database.ProductInterface) *ProductHandler {
 // @Success 201 {object} dto.ProductOutput
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
+// @Router /products [post]
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var productDTO dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&productDTO)
@@ -50,7 +53,9 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// Get Product Godoc
 // @Summary Get a product by ID
+// @Description Get a product by ID
 // @Tags Products
 // @Accept json
 // @Produce json
@@ -59,6 +64,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
+// @Router /products/{id} [get]
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -80,7 +86,9 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(dto)
 }
 
+// Update Product Godoc
 // @Summary Update a product
+// @Description Update a product
 // @Tags Products
 // @Accept json
 // @Produce json
@@ -90,6 +98,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
+// @Router /products/{id} [put]
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	// adquire o id
 	id := chi.URLParam(r, "id")
@@ -128,7 +137,9 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Delete Product Godoc
 // @Summary Delete a product
+// @Description Delete a product
 // @Tags Products
 // @Accept json
 // @Produce json
@@ -137,6 +148,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
+// @Router /products/{id} [delete]
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -162,7 +174,9 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// Get Products Godoc
 // @Summary Get all products
+// @Description Get all products
 // @Tags Products
 // @Accept json
 // @Produce json
@@ -173,6 +187,7 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} dto.ProductOutput
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
+// @Router /products [get]
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	page := r.URL.Query().Get("page")
 	pageInt, err := strconv.Atoi(page)

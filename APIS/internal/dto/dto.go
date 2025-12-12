@@ -1,5 +1,10 @@
 package dto
 
+type ErrorResponse struct {
+	Messages []string `json:"messages"`
+	Code     int      `json:"code"`
+}
+
 // CreateProductInput
 // usando o binding para quando for migrar pro gin
 type CreateProductInput struct {
