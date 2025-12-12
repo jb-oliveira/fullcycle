@@ -11,6 +11,7 @@ import (
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
 	entityPkg "github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
+	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/log"
 )
 
 type ProductHandler struct {
@@ -37,21 +38,31 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var productDTO dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&productDTO)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
 	// Deveria ser pelo Caso de Uso, mas por enquanto ta indo direto mesmo
 	p, err := entity.NewProduct(productDTO.Name, productDTO.Price)
 	if err != nil {
-		ReturnHttpError(w, err, http.StatusBadRequest)
+		log.Error(err.Error())
+		ReturnHttpError(w, errors.New("invalid product data"), http.StatusBadRequest)
 		return
 	}
 	err = h.productDB.Create(p)
 	if err != nil {
-		ReturnHttpError(w, err, http.StatusInternalServerError)
+		log.Error(err.Error())
+		ReturnHttpError(w, errors.New("failed to create product"), http.StatusInternalServerError)
 		return
 	}
+	productOutput := dto.ProductOutput{
+		ID:    p.ID.String(),
+		Name:  p.Name,
+		Price: p.Price,
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(productOutput)
 }
 
 // Get Product Godoc
@@ -70,11 +81,13 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
+		log.Error("invalid id")
 		ReturnHttpError(w, errors.New("invalid id"), http.StatusBadRequest)
 		return
 	}
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
@@ -106,11 +119,13 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	// adquire o id
 	id := chi.URLParam(r, "id")
 	if id == "" {
+		log.Error("id is required")
 		ReturnHttpError(w, errors.New("id is required"), http.StatusBadRequest)
 		return
 	}
 	_, err := entityPkg.ParseID(id)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
@@ -118,12 +133,14 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	var productDTO dto.UpdateProductInput
 	err = json.NewDecoder(r.Body).Decode(&productDTO)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
 	// carrega o produto
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
@@ -132,12 +149,19 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	product.Price = productDTO.Price
 	err = h.productDB.Update(product)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 	// Retorna o produto
+	productOutput := dto.ProductOutput{
+		ID:    product.ID.String(),
+		Name:  product.Name,
+		Price: product.Price,
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(productOutput)
 }
 
 // Delete Product Godoc
@@ -156,21 +180,25 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
+		log.Error("id is required")
 		ReturnHttpError(w, errors.New("id is required"), http.StatusBadRequest)
 		return
 	}
 	_, err := entityPkg.ParseID(id)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
 	err = h.productDB.Delete(product.ID.String())
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -222,6 +250,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	products, err := h.productDB.FindAll(pageInt, limitInt, sortComplete)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -235,6 +264,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	count, err := h.productDB.Count()
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}

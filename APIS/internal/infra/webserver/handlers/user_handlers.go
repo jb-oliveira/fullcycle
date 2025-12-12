@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/log"
+
 	"github.com/go-chi/jwtauth"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
 	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
@@ -33,7 +35,7 @@ func NewUserHandler(userDB database.UserInterface, jwtAuth *jwtauth.JWTAuth, exp
 // @Accept       json
 // @Produce      json
 // @Param        request body dto.LoginInput true "User login credentials"
-// @Success      200 {object} object{access_token=string} "Authentication successful"
+// @Success      200 {object} dto.AuthResponse "Authentication successful"
 // @Failure      400 {object} dto.ErrorResponse
 // @Failure      401 {object} dto.ErrorResponse
 // @Failure      404 {object} dto.ErrorResponse
@@ -43,24 +45,25 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	userLogin := &dto.LoginInput{}
 	err := json.NewDecoder(r.Body).Decode(userLogin)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("Invalid request body"), http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.userDB.FindByEmail(userLogin.Email)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("User not found"), http.StatusNotFound)
 		return
 	}
 
 	if !user.ValidatePassword(userLogin.Password) {
+		log.Error("Invalid credentials")
 		ReturnHttpError(w, errors.New("Invalid credentials"), http.StatusUnauthorized)
 		return
 	}
 
-	accessToken := struct {
-		AccessToken string `json:"access_token"`
-	}{}
+	accessToken := dto.AuthResponse{}
 
 	_, token, err := h.jwtAuth.Encode(map[string]interface{}{
 		"sub": user.ID.String(),
@@ -68,11 +71,12 @@ func (h *UserHandler) Auth(w http.ResponseWriter, r *http.Request) {
 		"exp": time.Now().Add(time.Second * time.Duration(h.jwtExpiration)).Unix(),
 	})
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("Failed to generate token"), http.StatusInternalServerError)
 		return
 	}
 
-	accessToken.AccessToken = token
+	accessToken.Token = token
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -94,16 +98,19 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	inserInput := dto.CreateUserInput{}
 	err := json.NewDecoder(r.Body).Decode(&inserInput)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("Invalid request body"), http.StatusBadRequest)
 		return
 	}
 	user, err := entity.NewUser(inserInput.Name, inserInput.Email, inserInput.Password)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
 	err = h.userDB.Create(user)
 	if err != nil {
+		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("Failed to create user"), http.StatusInternalServerError)
 		return
 	}

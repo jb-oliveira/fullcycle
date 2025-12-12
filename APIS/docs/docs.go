@@ -380,12 +380,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Authentication successful",
                         "schema": {
-                            "type": "object",
-                            "properties": {
-                                "access_token": {
-                                    "type": "string"
-                                }
-                            }
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -417,6 +412,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateProductInput": {
             "type": "object",
             "required": [

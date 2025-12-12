@@ -16,8 +16,11 @@ func ReturnHttpErrors(w http.ResponseWriter, errors []error, code int) {
 	for _, err := range errors {
 		messages = append(messages, err.Error())
 	}
-	json.NewEncoder(w).Encode(dto.ErrorResponse{
+	newVar := dto.ErrorResponse{
 		Messages: messages,
 		Code:     code,
-	})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(newVar)
 }

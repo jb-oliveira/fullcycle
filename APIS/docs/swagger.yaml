@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  dto.AuthResponse:
+    properties:
+      token:
+        type: string
+    type: object
   dto.CreateProductInput:
     properties:
       name:
@@ -312,10 +317,7 @@ paths:
         "200":
           description: Authentication successful
           schema:
-            properties:
-              access_token:
-                type: string
-            type: object
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: Bad Request
           schema:

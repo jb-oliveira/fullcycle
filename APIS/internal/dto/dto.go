@@ -5,6 +5,10 @@ type ErrorResponse struct {
 	Code     int      `json:"code"`
 }
 
+type AuthResponse struct {
+	Token string `json:"token"`
+}
+
 // CreateProductInput
 // usando o binding para quando for migrar pro gin
 type CreateProductInput struct {
