@@ -28,9 +28,9 @@ func main() {
 
 	select {
 	case cep := <-ch1:
-		fmt.Printf("Received: %v\n", cep)
+		fmt.Printf("Received ViaCep: %v\n", cep)
 	case cep := <-ch2:
-		fmt.Printf("Received: %v\n", cep)
+		fmt.Printf("Received BrasilApi: %v\n", cep)
 	case <-time.After(1 * time.Second):
 		println("timeout")
 	}
