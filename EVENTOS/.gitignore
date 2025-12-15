@@ -1,0 +1,8 @@
+# add ignore for ides
+*.iml
+.idea
+*.iws
+*.ipr
+# add ignore for vscodes
+.vscode
+# add ignore for node_modules
