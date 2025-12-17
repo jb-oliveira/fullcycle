@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -24,14 +25,14 @@ func main() {
 	ch2 := make(chan Cep)
 
 	go loadDataFromUrl(urlViaCep, &ViaCep{}, ch1)
-	go loadDataFromUrl(urlBrasilApi, &BrasilApiCep{}, ch1)
+	go loadDataFromUrl(urlBrasilApi, &BrasilApiCep{}, ch2)
 
 	select {
 	case cep := <-ch1:
 		fmt.Printf("Received ViaCep: %v\n", cep)
 	case cep := <-ch2:
 		fmt.Printf("Received BrasilApi: %v\n", cep)
-	case <-time.After(1 * time.Second):
+	case <-time.After(4 * time.Second):
 		println("timeout")
 	}
 	close(ch1)
@@ -41,19 +42,27 @@ func main() {
 func loadDataFromUrl(url string, conversor ConversorCep, ch chan<- Cep) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+		log.Default().Printf("Erro ao criar requisição: %v\n", url)
+		log.Default().Println(err)
 		return
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		log.Default().Printf("Erro ao fazer requisição: %v\n", url)
+		log.Default().Println(err)
 		return
 	}
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
+		log.Default().Printf("Erro ao ler o corpo da resposta: %v\n", url)
+		log.Default().Println(err)
 		return
 	}
 	err = json.Unmarshal(body, &conversor)
 	if err != nil {
+		log.Default().Printf("Erro ao fazer parse do JSON: %v\n", url)
+		log.Default().Println(err)
 		return
 	}
 	ch <- conversor.ToCep()
