@@ -32,7 +32,7 @@ func main() {
 		fmt.Printf("Received ViaCep: %v\n", cep)
 	case cep := <-ch2:
 		fmt.Printf("Received BrasilApi: %v\n", cep)
-	case <-time.After(4 * time.Second):
+	case <-time.After(1 * time.Second):
 		println("timeout")
 	}
 	close(ch1)
@@ -61,7 +61,7 @@ func loadDataFromUrl(url string, conversor ConversorCep, ch chan<- Cep) {
 	}
 	err = json.Unmarshal(body, &conversor)
 	if err != nil {
-		log.Default().Printf("Erro ao fazer parse do JSON: %v\n", url)
+		log.Default().Printf("Erro ao fazer parse do JSON: %v\n", string(body))
 		log.Default().Println(err)
 		return
 	}
