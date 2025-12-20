@@ -15,7 +15,7 @@ func main() {
 	defer ch.Close()
 
 	for i := 1; i <= 100; i++ {
-		rabbitmq.Publish(ch, fmt.Sprintf("Mensagem: %d", i))
+		rabbitmq.Publish(ch, "amq.direct", fmt.Sprintf("Mensagem: %d", i))
 		time.Sleep(200 * time.Millisecond)
 	}
 

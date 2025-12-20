@@ -563,12 +563,12 @@ func Consume(ch *amqp.Channel, queue string, out chan<- amqp.Delivery) error {
 	return nil
 }
 
-func Publish(ch *amqp.Channel, body string) error {
+func Publish(ch *amqp.Channel, exchange string, body string) error {
 	return ch.Publish(
-		"amq.direct", // exchange
-		"",           // routing key (nome da fila) deixa em branco a excengae vai fazer o trabalho
-		false,        // mandatory
-		false,        // immediate
+		exchange, // exchange
+		"",       // routing key (nome da fila) deixa em branco a excengae vai fazer o trabalho
+		false,    // mandatory
+		false,    // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
