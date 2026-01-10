@@ -19,3 +19,16 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 
 Vai de go mod init pra iniciar o projeto
+
+
+Instalar o plugin "vscode-proto3"
+
+
+pra gerar o codigo "protoc --go_out=. --go-grpc_out=. proto/entities.proto"
+
+
+pode usar o cliente evans "go install github.com/ktr0731/evans@latest"
+roda: evans -r repl
+escolhe o pacote: package pb
+escolhe o serviço: service CategoryService
+faz a chamada: call CreateCategory
