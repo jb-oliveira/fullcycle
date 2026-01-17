@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/jb-oliveira/fullcycle/gRPC/internal/database"
 	"github.com/jb-oliveira/fullcycle/gRPC/internal/pb"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -48,6 +50,33 @@ func (c *CategoryService) CreateCategory(ctx context.Context, in *pb.CreateCateg
 		},
 	}, nil
 }
+
+func (c *CategoryService) CreateCategoryStream(stream grpc.ClientStreamingServer[pb.CreateCategoryRequest, pb.CategoryListResponse]) error {
+	categories := &pb.CategoryListResponse{}
+
+	for {
+		category, err := stream.Recv()
+		if err == io.EOF {
+			return stream.SendAndClose(categories)
+		}
+		if err != nil {
+			return err
+		}
+		c.categoryDB.Name = category.Name
+		c.categoryDB.Description = category.Description
+		err = c.categoryDB.Create()
+		if err != nil {
+			return err
+		}
+		categories.Categories = append(categories.Categories, &pb.Category{
+			Id:          c.categoryDB.Id,
+			Name:        c.categoryDB.Name,
+			Description: c.categoryDB.Description,
+		})
+	}
+
+}
+
 func (c *CategoryService) ListCategory(ctx context.Context, in *emptypb.Empty) (*pb.CategoryListResponse, error) {
 	categories, err := c.categoryDB.FindAll()
 	if err != nil {

@@ -285,9 +285,10 @@ const file_proto_entities_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"$\n" +
 	"\x12GetCategoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\xd9\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\xaa\x02\n" +
 	"\x0fCategoryService\x12C\n" +
-	"\x0eCreateCategory\x12\x19.pb.CreateCategoryRequest\x1a\x14.pb.CategoryResponse\"\x00\x12B\n" +
+	"\x0eCreateCategory\x12\x19.pb.CreateCategoryRequest\x1a\x14.pb.CategoryResponse\"\x00\x12O\n" +
+	"\x14CreateCategoryStream\x12\x19.pb.CreateCategoryRequest\x1a\x18.pb.CategoryListResponse\"\x00(\x01\x12B\n" +
 	"\fListCategory\x12\x16.google.protobuf.Empty\x1a\x18.pb.CategoryListResponse\"\x00\x12=\n" +
 	"\vGetCategory\x12\x16.pb.GetCategoryRequest\x1a\x14.pb.CategoryResponse\"\x00B\rZ\vinternal/pbb\x06proto3"
 
@@ -316,13 +317,15 @@ var file_proto_entities_proto_depIdxs = []int32{
 	0, // 0: pb.CategoryResponse.category:type_name -> pb.Category
 	0, // 1: pb.CategoryListResponse.categories:type_name -> pb.Category
 	3, // 2: pb.CategoryService.CreateCategory:input_type -> pb.CreateCategoryRequest
-	5, // 3: pb.CategoryService.ListCategory:input_type -> google.protobuf.Empty
-	4, // 4: pb.CategoryService.GetCategory:input_type -> pb.GetCategoryRequest
-	1, // 5: pb.CategoryService.CreateCategory:output_type -> pb.CategoryResponse
-	2, // 6: pb.CategoryService.ListCategory:output_type -> pb.CategoryListResponse
-	1, // 7: pb.CategoryService.GetCategory:output_type -> pb.CategoryResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
+	3, // 3: pb.CategoryService.CreateCategoryStream:input_type -> pb.CreateCategoryRequest
+	5, // 4: pb.CategoryService.ListCategory:input_type -> google.protobuf.Empty
+	4, // 5: pb.CategoryService.GetCategory:input_type -> pb.GetCategoryRequest
+	1, // 6: pb.CategoryService.CreateCategory:output_type -> pb.CategoryResponse
+	2, // 7: pb.CategoryService.CreateCategoryStream:output_type -> pb.CategoryListResponse
+	2, // 8: pb.CategoryService.ListCategory:output_type -> pb.CategoryListResponse
+	1, // 9: pb.CategoryService.GetCategory:output_type -> pb.CategoryResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
