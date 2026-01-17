@@ -62,6 +62,7 @@ func main() {
 		return
 	}
 
+	// Recebe os dados
 	waitc := make(chan struct{})
 	go func() {
 		for {
@@ -78,6 +79,7 @@ func main() {
 		}
 	}()
 
+	// Envia os dados
 	for i := 0; i < 5; i++ {
 		if err := streamBidi.Send(&pb.CreateCategoryRequest{
 			Name:        fmt.Sprintf("Test Category %d", i),
