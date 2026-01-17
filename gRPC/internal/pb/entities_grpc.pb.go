@@ -20,10 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CategoryService_CreateCategory_FullMethodName       = "/pb.CategoryService/CreateCategory"
-	CategoryService_CreateCategoryStream_FullMethodName = "/pb.CategoryService/CreateCategoryStream"
-	CategoryService_ListCategory_FullMethodName         = "/pb.CategoryService/ListCategory"
-	CategoryService_GetCategory_FullMethodName          = "/pb.CategoryService/GetCategory"
+	CategoryService_CreateCategory_FullMethodName                    = "/pb.CategoryService/CreateCategory"
+	CategoryService_CreateCategoryStream_FullMethodName              = "/pb.CategoryService/CreateCategoryStream"
+	CategoryService_CreateCategoryStreamBidirectional_FullMethodName = "/pb.CategoryService/CreateCategoryStreamBidirectional"
+	CategoryService_ListCategory_FullMethodName                      = "/pb.CategoryService/ListCategory"
+	CategoryService_GetCategory_FullMethodName                       = "/pb.CategoryService/GetCategory"
 )
 
 // CategoryServiceClient is the client API for CategoryService service.
@@ -32,6 +33,7 @@ const (
 type CategoryServiceClient interface {
 	CreateCategory(ctx context.Context, in *CreateCategoryRequest, opts ...grpc.CallOption) (*CategoryResponse, error)
 	CreateCategoryStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateCategoryRequest, CategoryListResponse], error)
+	CreateCategoryStreamBidirectional(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CreateCategoryRequest, CategoryResponse], error)
 	ListCategory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryListResponse, error)
 	GetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*CategoryResponse, error)
 }
@@ -67,6 +69,19 @@ func (c *categoryServiceClient) CreateCategoryStream(ctx context.Context, opts .
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type CategoryService_CreateCategoryStreamClient = grpc.ClientStreamingClient[CreateCategoryRequest, CategoryListResponse]
 
+func (c *categoryServiceClient) CreateCategoryStreamBidirectional(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CreateCategoryRequest, CategoryResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CategoryService_ServiceDesc.Streams[1], CategoryService_CreateCategoryStreamBidirectional_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[CreateCategoryRequest, CategoryResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CategoryService_CreateCategoryStreamBidirectionalClient = grpc.BidiStreamingClient[CreateCategoryRequest, CategoryResponse]
+
 func (c *categoryServiceClient) ListCategory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CategoryListResponse)
@@ -93,6 +108,7 @@ func (c *categoryServiceClient) GetCategory(ctx context.Context, in *GetCategory
 type CategoryServiceServer interface {
 	CreateCategory(context.Context, *CreateCategoryRequest) (*CategoryResponse, error)
 	CreateCategoryStream(grpc.ClientStreamingServer[CreateCategoryRequest, CategoryListResponse]) error
+	CreateCategoryStreamBidirectional(grpc.BidiStreamingServer[CreateCategoryRequest, CategoryResponse]) error
 	ListCategory(context.Context, *emptypb.Empty) (*CategoryListResponse, error)
 	GetCategory(context.Context, *GetCategoryRequest) (*CategoryResponse, error)
 	mustEmbedUnimplementedCategoryServiceServer()
@@ -110,6 +126,9 @@ func (UnimplementedCategoryServiceServer) CreateCategory(context.Context, *Creat
 }
 func (UnimplementedCategoryServiceServer) CreateCategoryStream(grpc.ClientStreamingServer[CreateCategoryRequest, CategoryListResponse]) error {
 	return status.Error(codes.Unimplemented, "method CreateCategoryStream not implemented")
+}
+func (UnimplementedCategoryServiceServer) CreateCategoryStreamBidirectional(grpc.BidiStreamingServer[CreateCategoryRequest, CategoryResponse]) error {
+	return status.Error(codes.Unimplemented, "method CreateCategoryStreamBidirectional not implemented")
 }
 func (UnimplementedCategoryServiceServer) ListCategory(context.Context, *emptypb.Empty) (*CategoryListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCategory not implemented")
@@ -162,6 +181,13 @@ func _CategoryService_CreateCategoryStream_Handler(srv interface{}, stream grpc.
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type CategoryService_CreateCategoryStreamServer = grpc.ClientStreamingServer[CreateCategoryRequest, CategoryListResponse]
+
+func _CategoryService_CreateCategoryStreamBidirectional_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(CategoryServiceServer).CreateCategoryStreamBidirectional(&grpc.GenericServerStream[CreateCategoryRequest, CategoryResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CategoryService_CreateCategoryStreamBidirectionalServer = grpc.BidiStreamingServer[CreateCategoryRequest, CategoryResponse]
 
 func _CategoryService_ListCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
@@ -223,6 +249,12 @@ var CategoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "CreateCategoryStream",
 			Handler:       _CategoryService_CreateCategoryStream_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "CreateCategoryStreamBidirectional",
+			Handler:       _CategoryService_CreateCategoryStreamBidirectional_Handler,
+			ServerStreams: true,
 			ClientStreams: true,
 		},
 	},

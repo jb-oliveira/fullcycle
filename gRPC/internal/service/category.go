@@ -77,6 +77,34 @@ func (c *CategoryService) CreateCategoryStream(stream grpc.ClientStreamingServer
 
 }
 
+func (c *CategoryService) CreateCategoryStreamBidirectional(stream grpc.BidiStreamingServer[pb.CreateCategoryRequest, pb.CategoryResponse]) error {
+	for {
+		category, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		c.categoryDB.Name = category.Name
+		c.categoryDB.Description = category.Description
+		err = c.categoryDB.Create()
+		if err != nil {
+			return err
+		}
+		err = stream.Send(&pb.CategoryResponse{
+			Category: &pb.Category{
+				Id:          c.categoryDB.Id,
+				Name:        c.categoryDB.Name,
+				Description: c.categoryDB.Description,
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+}
+
 func (c *CategoryService) ListCategory(ctx context.Context, in *emptypb.Empty) (*pb.CategoryListResponse, error) {
 	categories, err := c.categoryDB.FindAll()
 	if err != nil {
