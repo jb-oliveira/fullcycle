@@ -12,10 +12,23 @@ import (
 	// S3 Specific types (like BucketLocationConstraint)
 )
 
-func main() {
+var (
+	dirName = "../../tmp"
+)
 
+func main() {
+	currDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Current working directory:", currDir)
+
+	bucketName := os.Getenv("BUCKET_NAME")
+	if bucketName == "" {
+		log.Fatalf("BUCKET_NAME environment variable is not set")
+	}
 	// Load the AWS configuration (credentials, region, etc.)
-	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion("us-east-1"))
+	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion("sa-east-1"))
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
@@ -32,13 +45,16 @@ func main() {
 	fmt.Println("Buckets:")
 	for _, bucket := range buckets.Buckets {
 		fmt.Printf(" - %s\n", *bucket.Name)
+		if *bucket.Name == bucketName {
+			fmt.Println("Bucket found")
+		}
 	}
 
 	// Example: Using the Manager for Upload
 	// uploader := manager.NewUploader(client) // Requires client.ConfigProvider, which cfg satisfies
 	// _, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{ ... })
 
-	dir, err := os.ReadDir("./tmp")
+	dir, err := os.ReadDir(dirName)
 	if err != nil {
 		log.Fatalf("failed to read directory, %v", err)
 	}
@@ -47,15 +63,15 @@ func main() {
 			continue
 		}
 		fmt.Println(entry.Name())
-		// if err := uploadFile(client, "first-bucket-s3", entry.Name()); err != nil {
-		// 	log.Fatalf("failed to upload file, %v", err)
-		// }
+		if err := uploadFile(client, bucketName, entry.Name()); err != nil {
+			log.Fatalf("failed to upload file, %v", err)
+		}
 	}
 
 }
 
 func uploadFile(client *s3.Client, bucketName string, filePath string) error {
-	file, err := os.Open("./tmp/" + filePath)
+	file, err := os.Open(dirName + "/" + filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open file %q: %w", filePath, err)
 	}
