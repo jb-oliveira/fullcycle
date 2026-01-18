@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	// Core AWS types, interfaces, config
 	"github.com/aws/aws-sdk-go-v2/config"     // Configuration loading
@@ -14,6 +15,7 @@ import (
 
 var (
 	dirName = "../../tmp"
+	wg      sync.WaitGroup
 )
 
 func main() {
@@ -50,9 +52,21 @@ func main() {
 		}
 	}
 
-	// Example: Using the Manager for Upload
-	// uploader := manager.NewUploader(client) // Requires client.ConfigProvider, which cfg satisfies
-	// _, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{ ... })
+	// Isso aqui serve como semaforo para controlar o numero de threads
+	uploadControl := make(chan int, 3)
+
+	// Isso aqui serve para retentar enviar o arquivos que deram erro
+	// achei meio paia, porque pode cair num loop infinito
+	retryUpload := make(chan string, 2)
+	go func() {
+		for fileName := range retryUpload {
+			fmt.Println("Retrying upload for file:", fileName)
+			// Increment WaitGroup and respect semaphore for retries
+			wg.Add(1)
+			uploadControl <- 1
+			go uploadFile(client, bucketName, fileName, uploadControl, retryUpload)
+		}
+	}()
 
 	dir, err := os.ReadDir(dirName)
 	if err != nil {
@@ -63,16 +77,31 @@ func main() {
 			continue
 		}
 		fmt.Println(entry.Name())
-		if err := uploadFile(client, bucketName, entry.Name()); err != nil {
-			log.Fatalf("failed to upload file, %v", err)
-		}
+		// Sequential upload
+		// if err := uploadFile(client, bucketName, entry.Name()); err != nil {
+		// 	log.Fatalf("failed to upload file, %v", err)
+		// }
+		// Parallel upload
+		wg.Add(1)
+		// adiciona 1 no channel
+		uploadControl <- 1
+		go uploadFile(client, bucketName, entry.Name(), uploadControl, retryUpload)
 	}
+	// fecha o channel
+	close(uploadControl)
 
+	// Wait for	all uploads to complete
+	wg.Wait()
 }
 
-func uploadFile(client *s3.Client, bucketName string, filePath string) error {
+func uploadFile(client *s3.Client, bucketName string, filePath string, uploadControl <-chan int, retryUpload chan<- string) error {
+	// necessario pro paralelismo
+	defer wg.Done()
+	defer func() { <-uploadControl }()
+
 	file, err := os.Open(dirName + "/" + filePath)
 	if err != nil {
+		retryUpload <- filePath
 		return fmt.Errorf("failed to open file %q: %w", filePath, err)
 	}
 	defer file.Close()
@@ -83,6 +112,7 @@ func uploadFile(client *s3.Client, bucketName string, filePath string) error {
 		Body:   file,
 	})
 	if err != nil {
+		retryUpload <- filePath
 		return fmt.Errorf("failed to upload file to S3: %w", err)
 	}
 
