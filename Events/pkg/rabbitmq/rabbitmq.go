@@ -8,10 +8,10 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// Mandei o Kiro gerar com reconexão, é esse connection manager pra usar ver o arquivo example_usage.go
-// os do curso tão la embaixo procurar por CURSO...
+// I asked Kiro to generate with reconnection, this is the connection manager to use see the example_usage.go file
+// the course ones are down below look for CURSO...
 
-// A do kiro funciona assim...
+// The Kiro one works like this...
 // cm := rabbitmq.NewConnectionManager("", "", "")
 // err := cm.Connect()
 // messageChannel := make(chan amqp.Delivery)
@@ -543,8 +543,8 @@ func OpenChannel() (*amqp.Channel, error) {
 
 func Consume(ch *amqp.Channel, queue string, out chan<- amqp.Delivery) error {
 	msgs, err := ch.Consume(
-		queue,         // queue (fila)
-		"go-consumer", // consumer (nome da aplicação)
+		queue,         // queue (queue)
+		"go-consumer", // consumer (application name)
 		false,         // auto-ack
 		false,         // exclusive
 		false,         // no-local
@@ -555,7 +555,7 @@ func Consume(ch *amqp.Channel, queue string, out chan<- amqp.Delivery) error {
 		return err
 	}
 
-	// vai ler a mensagem de msgs em msg e joga no Canal do GO
+	// will read the message from msgs in msg and throw it into the GO Channel
 	for msg := range msgs {
 		out <- msg
 	}

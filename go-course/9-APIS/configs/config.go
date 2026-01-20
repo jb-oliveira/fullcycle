@@ -40,8 +40,8 @@ func LoadDbConfig(path string) {
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
 	viper.SetConfigFile(".env")
-	// viper.AutomaticEnv() = Isso faz com que ele sobscreva as variaveis de ambiente
-	// ao inves do que tiver no .env  Caso  não tenha nas variaveis de ambiente ele carrega o que ta .env
+	// viper.AutomaticEnv() = This makes it override environment variables
+	// instead of what's in the .env file. If not found in environment variables, it loads what's in .env
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
@@ -61,8 +61,8 @@ func LoadWebConfig(path string) {
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
 	viper.SetConfigFile(".env")
-	// viper.AutomaticEnv() = Isso faz com que ele sobscreva as variaveis de ambiente
-	// ao inves do que tiver no .env  Caso  não tenha nas variaveis de ambiente ele carrega o que ta .env
+	// viper.AutomaticEnv() = This makes it override environment variables
+	// instead of what's in the .env file. If not found in environment variables, it loads what's in .env
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()

@@ -64,13 +64,13 @@ type UrlResponse struct {
 func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 	request, err := loadDataFromUrl()
 	if err != nil {
-		log.Println("Error consultando url", err)
+		log.Println("Error consulting url", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	err = saveToDataBase(request)
 	if err != nil {
-		log.Println("Erro salvando no DB", err)
+		log.Println("Error saving to DB", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

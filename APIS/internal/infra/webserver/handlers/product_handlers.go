@@ -42,7 +42,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
-	// Deveria ser pelo Caso de Uso, mas por enquanto ta indo direto mesmo
+	// Should be through Use Case, but for now it's going direct
 	p, err := entity.NewProduct(productDTO.Name, productDTO.Price)
 	if err != nil {
 		log.Error(err.Error())
@@ -116,7 +116,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 // @Security ApiKeyAuth
 // @Router /products/{id} [put]
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
-	// adquire o id
+	// acquire the id
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		log.Error("id is required")
@@ -129,7 +129,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		ReturnHttpError(w, err, http.StatusBadRequest)
 		return
 	}
-	// deserializa
+	// deserialize
 	var productDTO dto.UpdateProductInput
 	err = json.NewDecoder(r.Body).Decode(&productDTO)
 	if err != nil {
@@ -137,14 +137,14 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		ReturnHttpError(w, errors.New("invalid request body"), http.StatusBadRequest)
 		return
 	}
-	// carrega o produto
+	// load the product
 	product, err := h.productDB.FindByID(id)
 	if err != nil {
 		log.Error(err.Error())
 		ReturnHttpError(w, errors.New("product not found"), http.StatusNotFound)
 		return
 	}
-	// salva o produto
+	// save the product
 	product.Name = productDTO.Name
 	product.Price = productDTO.Price
 	err = h.productDB.Update(product)
@@ -153,7 +153,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		ReturnHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
-	// Retorna o produto
+	// Return the product
 	productOutput := dto.ProductOutput{
 		ID:    product.ID.String(),
 		Name:  product.Name,

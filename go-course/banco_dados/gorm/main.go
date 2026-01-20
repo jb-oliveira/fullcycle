@@ -53,15 +53,15 @@ func (SerialNumber) TableName() string {
 }
 
 // func (u *Produto) BeforeCreate(tx *gorm.DB) error {
-// 	// Verifica se o ID já está preenchido (útil para testes ou inserts manuais)
+// 	// Checks if the ID is already filled (useful for tests or manual inserts)
 // 	if u.ID == "" {
 // 		uuid, err := uuid.NewV7()
 // 		if err != nil {
 // 			return err
 // 		}
-// 		// Gera um UUID v7 e o converte para string
+// 		// Generates a UUID v7 and converts it to string
 // 		u.ID = uuid.String()
-// 		// Se você estiver usando uma biblioteca específica para V7:
+// 		// If you are using a specific library for V7:
 // 		// u.ID = uuid.NewV7().String()
 // 	}
 // 	return nil
@@ -246,9 +246,9 @@ func main() {
 	// 	panic(err)
 	// }
 	// if rowCount > 0 {
-	// 	fmt.Println("Produto existia")
+	// 	fmt.Println("Product existed")
 	// } else {
-	// 	fmt.Println("Não achou")
+	// 	fmt.Println("Not found")
 	// }
 
 }

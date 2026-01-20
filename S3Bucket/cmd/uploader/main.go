@@ -52,11 +52,11 @@ func main() {
 		}
 	}
 
-	// Isso aqui serve como semaforo para controlar o numero de threads
+	// This serves as a semaphore to control the number of threads
 	uploadControl := make(chan int, 3)
 
-	// Isso aqui serve para retentar enviar o arquivos que deram erro
-	// achei meio paia, porque pode cair num loop infinito
+	// This serves to retry sending files that failed
+	// I found it a bit bad, because it can fall into an infinite loop
 	retryUpload := make(chan string, 2)
 	go func() {
 		for fileName := range retryUpload {
@@ -83,11 +83,11 @@ func main() {
 		// }
 		// Parallel upload
 		wg.Add(1)
-		// adiciona 1 no channel
+		// adds 1 to the channel
 		uploadControl <- 1
 		go uploadFile(client, bucketName, entry.Name(), uploadControl, retryUpload)
 	}
-	// fecha o channel
+	// close the channel
 	close(uploadControl)
 
 	// Wait for	all uploads to complete
@@ -95,7 +95,7 @@ func main() {
 }
 
 func uploadFile(client *s3.Client, bucketName string, filePath string, uploadControl <-chan int, retryUpload chan<- string) error {
-	// necessario pro paralelismo
+	// necessary for parallelism
 	defer wg.Done()
 	defer func() { <-uploadControl }()
 

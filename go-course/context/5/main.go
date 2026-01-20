@@ -6,64 +6,64 @@ import (
 	"time"
 )
 
-// longRunningTask simula uma tarefa que executa várias etapas (iterações).
-// Ela verifica o contexto a cada passo para ver se deve parar.
+// longRunningTask simulates a task that executes multiple steps (iterations).
+// It checks the context at each step to see if it should stop.
 func longRunningTask(ctx context.Context, taskName string, maxIterations int) (string, error) {
-	fmt.Printf("[%s] Tarefa iniciada. Vai tentar %d iterações.\n", taskName, maxIterations)
+	fmt.Printf("[%s] Task started. Will try %d iterations.\n", taskName, maxIterations)
 
 	for i := 1; i <= maxIterations; i++ {
-		// 1. O Ponto de Verificação Crítico:
+		// 1. The Critical Checkpoint:
 		select {
 		case <-ctx.Done():
-			// O canal ctx.Done() foi fechado, o que significa que o timeout expirou
-			// ou o contexto foi cancelado.
-			fmt.Printf("[%s] ❌ Interrompida! Contexto cancelado após %d iterações.\n", taskName, i-1)
-			return "", ctx.Err() // Retorna o erro do contexto (deadline exceeded)
+			// The ctx.Done() channel was closed, which means the timeout expired
+			// or the context was canceled.
+			fmt.Printf("[%s] ❌ Interrupted! Context canceled after %d iterations.\n", taskName, i-1)
+			return "", ctx.Err() // Returns the context error (deadline exceeded)
 		default:
-			// Não houve cancelamento, continua o trabalho.
+			// No cancellation occurred, continue the work.
 		}
 
-		// Simulação de uma parte do trabalho (cada passo demora 100ms)
+		// Simulation of part of the work (each step takes 100ms)
 		time.Sleep(100 * time.Millisecond)
-		fmt.Printf("[%s] Passo %d/%d concluído.\n", taskName, i, maxIterations)
+		fmt.Printf("[%s] Step %d/%d completed.\n", taskName, i, maxIterations)
 	}
 
-	// Se o loop terminar sem o contexto ser cancelado
-	fmt.Printf("[%s] ✅ Concluída com sucesso após %d iterações.\n", taskName, maxIterations)
-	return fmt.Sprintf("Tarefa '%s' concluída.", taskName), nil
+	// If the loop finishes without the context being canceled
+	fmt.Printf("[%s] ✅ Completed successfully after %d iterations.\n", taskName, maxIterations)
+	return fmt.Sprintf("Task '%s' completed.", taskName), nil
 }
 
 func main() {
 
-	// --- Cenário 1: Sucesso (Timeout longo o suficiente) ---
-	fmt.Println("--- Cenário 1: Sucesso (Timeout de 1 segundo) ---")
+	// --- Scenario 1: Success (Long enough timeout) ---
+	fmt.Println("--- Scenario 1: Success (1 second timeout) ---")
 
-	// Definimos 1 segundo de timeout. A tarefa completa (5 passos * 100ms = 500ms).
+	// We define 1 second timeout. The task completes (5 steps * 100ms = 500ms).
 	ctx1, cancel1 := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel1()
 
 	result1, err1 := longRunningTask(ctx1, "Task-A", 5)
 
 	if err1 != nil {
-		fmt.Printf("Resultado Task-A: Erro: %v\n", err1)
+		fmt.Printf("Task-A Result: Error: %v\n", err1)
 	} else {
-		fmt.Printf("Resultado Task-A: %s\n", result1)
+		fmt.Printf("Task-A Result: %s\n", result1)
 	}
 
-	fmt.Println("\n" + "--- Cenário 2: Timeout Expirado (Timeout curto) ---")
+	fmt.Println("\n" + "--- Scenario 2: Timeout Expired (Short timeout) ---")
 
-	// --- Cenário 2: Timeout Expirado ---
+	// --- Scenario 2: Timeout Expired ---
 
-	// Definimos apenas 250ms de timeout.
-	// A tarefa precisaria de 1 segundo (10 passos * 100ms).
+	// We define only 250ms timeout.
+	// The task would need 1 second (10 steps * 100ms).
 	ctx2, cancel2 := context.WithTimeout(context.Background(), 250*time.Millisecond)
 	defer cancel2()
 
 	result2, err2 := longRunningTask(ctx2, "Task-B", 10)
 
 	if err2 != nil {
-		fmt.Printf("Resultado Task-B: Erro: %v\n", err2)
+		fmt.Printf("Task-B Result: Error: %v\n", err2)
 	} else {
-		fmt.Printf("Resultado Task-B: %s\n", result2)
+		fmt.Printf("Task-B Result: %s\n", result2)
 	}
 }

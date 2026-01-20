@@ -13,10 +13,10 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "CLI",
-	Short: "Aplicação usando cobra CLI",
-	Long: `Aplicação de teste para o curso de CLI 
+	Short: "Application using cobra CLI",
+	Long: `Test application for the CLI course 
 FullCycle 3.0 - Go Lang
-usando o framework cobra`,
+using the cobra framework`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -44,6 +44,6 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	rootCmd.Flags().StringP("env", "e", "", "Ambiente de execução")
+	rootCmd.Flags().StringP("env", "e", "", "Execution environment")
 	rootCmd.MarkFlagRequired("env")
 }

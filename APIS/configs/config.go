@@ -41,13 +41,13 @@ func LoadDbConfig(path string) (*confDB, error) {
 
 	err := v.ReadInConfig()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao ler arquivo de configuração do banco: %w", err)
+		return nil, fmt.Errorf("error reading database configuration file: %w", err)
 	}
 
 	var config confDB
 	err = v.Unmarshal(&config)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao deserializar configuração do banco: %w", err)
+		return nil, fmt.Errorf("error deserializing database configuration: %w", err)
 	}
 
 	dbConfig = &config
@@ -63,13 +63,13 @@ func LoadWebConfig(path string) (*confWeb, error) {
 
 	err := v.ReadInConfig()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao ler arquivo de configuração web: %w", err)
+		return nil, fmt.Errorf("error reading web configuration file: %w", err)
 	}
 
 	var config confWeb
 	err = v.Unmarshal(&config)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao deserializar configuração web: %w", err)
+		return nil, fmt.Errorf("error deserializing web configuration: %w", err)
 	}
 
 	config.TokenAuth = jwtauth.New("HS256", []byte(config.JWTSecret), nil)
@@ -87,7 +87,7 @@ func GetWebConfig() *confWeb {
 
 func InitGorm() error {
 	if dbConfig == nil {
-		return fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
+		return fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
 	}
 
 	dsn := buildDSN(dbConfig)
@@ -96,14 +96,14 @@ func InitGorm() error {
 	var err error
 	db, err = gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("erro ao abrir conexão com banco: %w", err)
+		return fmt.Errorf("error opening database connection: %w", err)
 	}
 	return nil
 }
 
 func GetDB() *gorm.DB {
 	if db == nil {
-		log.Fatal("GORM DB não inicializado")
+		log.Fatal("GORM DB not initialized")
 	}
 	return db
 }
@@ -125,11 +125,11 @@ func buildDSN(config *confDB) string {
 
 func GetDSN() (string, error) {
 	if dbConfig == nil {
-		return "", fmt.Errorf("configuração do banco não carregada: chame LoadDbConfig primeiro")
+		return "", fmt.Errorf("database configuration not loaded: call LoadDbConfig first")
 	}
 	dsn := buildDSN(dbConfig)
 	if dsn == "" {
-		return "", fmt.Errorf("driver de banco não suportado: %s", dbConfig.DBDriver)
+		return "", fmt.Errorf("unsupported database driver: %s", dbConfig.DBDriver)
 	}
 	return dsn, nil
 }

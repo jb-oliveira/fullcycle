@@ -13,7 +13,7 @@ import (
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Println("Uso: go run main.go <cep>")
+		fmt.Println("Usage: go run main.go <cep>")
 		return
 	}
 
@@ -42,26 +42,26 @@ func main() {
 func loadDataFromUrl(url string, conversor ConversorCep, ch chan<- Cep) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Default().Printf("Erro ao criar requisição: %v\n", url)
+		log.Default().Printf("Error creating request: %v\n", url)
 		log.Default().Println(err)
 		return
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Default().Printf("Erro ao fazer requisição: %v\n", url)
+		log.Default().Printf("Error making request: %v\n", url)
 		log.Default().Println(err)
 		return
 	}
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Default().Printf("Erro ao ler o corpo da resposta: %v\n", url)
+		log.Default().Printf("Error reading response body: %v\n", url)
 		log.Default().Println(err)
 		return
 	}
 	err = json.Unmarshal(body, &conversor)
 	if err != nil {
-		log.Default().Printf("Erro ao fazer parse do JSON: %v\n", string(body))
+		log.Default().Printf("Error parsing JSON: %v\n", string(body))
 		log.Default().Println(err)
 		return
 	}

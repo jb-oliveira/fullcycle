@@ -28,7 +28,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(testCmd)
 	testCmd.Flags().StringP("comando", "c", "", "Comando para testar")
-	// isso aqui obriga o usuario a passar o comando
+	// this forces the user to pass the command
 	testCmd.MarkFlagRequired("comando")
 
 	// Here you will define your flags and configuration settings.

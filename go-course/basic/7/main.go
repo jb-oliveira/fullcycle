@@ -28,7 +28,7 @@ type MyNumber int
 
 type Number interface {
 	~int | ~float64
-	// o til serve pra indentificar qulquer tipo de inteiro como no caso do myNumber
+	// the tilde serves to identify any type of integer as in the case of myNumber
 }
 
 func somaConstraint[T Number](m map[string]T) T {

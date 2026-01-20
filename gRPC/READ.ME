@@ -1,34 +1,34 @@
-Como instalar:
+How to install:
 
-Vai instalar o protoc no linux é:
+To install protoc on Linux:
 
 apt install -y protobuf-compiler
 
-depois roda:
+then run:
 protoc --version
-tem que ser maior que 3
+must be greater than 3
 
 
-Vai no site do gRPC.io
+Go to the gRPC.io website
 
-atualmente executa essas duas linhas:
+currently execute these two lines:
 
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 
 
-Vai de go mod init pra iniciar o projeto
+Run go mod init to initialize the project
 
 
-Instalar o plugin "vscode-proto3"
+Install the "vscode-proto3" plugin
 
 
-pra gerar o codigo "protoc --go_out=. --go-grpc_out=. proto/entities.proto"
+to generate the code "protoc --go_out=. --go-grpc_out=. proto/entities.proto"
 
 
-pode usar o cliente evans "go install github.com/ktr0731/evans@latest"
-roda: evans -r repl
-escolhe o pacote: package pb
-escolhe o serviço: service CategoryService
-faz a chamada: call CreateCategory
+you can use the evans client "go install github.com/ktr0731/evans@latest"
+run: evans -r repl
+choose the package: package pb
+choose the service: service CategoryService
+make the call: call CreateCategory

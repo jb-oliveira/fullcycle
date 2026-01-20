@@ -28,21 +28,21 @@ func main() {
 	for _, cep := range os.Args[1:] {
 		req, err := http.Get("https://viacep.com.br/ws/" + cep + "/json/")
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Erro ao fazer requisição http: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error making http request: %v\n", err)
 		}
 		defer req.Body.Close()
 		res, err := io.ReadAll(req.Body)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Erro ao ler resposta: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error reading response: %v\n", err)
 		}
 		var data ViaCep
 		err = json.Unmarshal(res, &data)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Erro ao ler json: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error reading json: %v\n", err)
 		}
 		file, err := os.Create("cep.txt")
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Erro ao criar arquivo: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error creating file: %v\n", err)
 		}
 		defer file.Close()
 		_, err = file.WriteString(fmt.Sprintf("UF: %s, Cidade: %s, Bairro: %s,  Rua: %s", data.Uf, data.Localidade, data.Bairro, data.Logradouro))

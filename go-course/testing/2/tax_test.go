@@ -29,9 +29,9 @@ func (m *TaxRepositoryMock) Save(tax float64) error {
 
 func TestCalculateTaxAndSave(t *testing.T) {
 	repository := &TaxRepositoryMock{}
-	// o Once indica que so pode ser chamado uma vez com esse parametro
+	// the Once indicates that it can only be called once with this parameter
 	repository.On("Save", 10.0).Return(nil).Once()
-	repository.On("Save", 0.0).Return(errors.New("Erro salvando no banco de dados"))
+	repository.On("Save", 0.0).Return(errors.New("Error saving to database"))
 	// repository.On("Save", mock.Anything).Return(errors.New("Erro salvando no banco de dados"))
 
 	// The test is likely failing because CalculateTaxAndSave calculates tax first
@@ -41,7 +41,7 @@ func TestCalculateTaxAndSave(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = CalculateTaxAndSave(-1.0, repository) // Negative amount should cause validation error
-	assert.EqualError(t, err, "Erro salvando no banco de dados")
+	assert.EqualError(t, err, "Error saving to database")
 
 	repository.AssertExpectations(t)
 	repository.AssertNumberOfCalls(t, "Save", 2)

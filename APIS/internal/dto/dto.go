@@ -10,7 +10,7 @@ type AuthResponse struct {
 }
 
 // CreateProductInput
-// usando o binding para quando for migrar pro gin
+// using binding for when migrating to gin
 type CreateProductInput struct {
 	Name  string  `json:"name" binding:"required"`
 	Price float64 `json:"price" binding:"required,gt=0"`

@@ -53,7 +53,7 @@ func deleteProduct(db *sql.DB, id string) error {
 }
 
 func getAllProducts(db *sql.DB) ([]Product, error) {
-	// não precisa de statement por que não tem parametros
+	// no need for statement because there are no parameters
 	rows, err := db.Query("select id,name,price from products")
 	if err != nil {
 		return nil, err

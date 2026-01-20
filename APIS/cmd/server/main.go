@@ -36,14 +36,14 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	// Inicializa o banco
+	// Initialize the database
 	initDB()
-	// inicializa a web
+	// initialize the web
 	_, err := configs.LoadWebConfig(".")
 	if err != nil {
-		log.Fatalf("falha ao carregar configuração web: %v", err)
+		log.Fatalf("failed to load web configuration: %v", err)
 	}
-	log.Println("Configuração carregada com sucesso")
+	log.Println("Configuration loaded successfully")
 
 	productDB := database.NewProductDB(configs.GetDB())
 	productHandler := handlers.NewProductHandler(productDB)
@@ -82,22 +82,22 @@ func main() {
 func initDB() {
 	_, err := configs.LoadDbConfig(".")
 	if err != nil {
-		log.Fatalf("falha ao carregar configuração do banco: %v", err)
+		log.Fatalf("failed to load database configuration: %v", err)
 	}
 	err = configs.InitGorm()
 	if err != nil {
-		log.Fatalf("falha ao conectar ao banco: %v", err)
+		log.Fatalf("failed to connect to database: %v", err)
 	}
 
 	db := configs.GetDB()
 	if db == nil {
-		log.Fatal("instância do banco é nula")
+		log.Fatal("database instance is null")
 	}
 
-	// Remover o auto migrate e depois ver qual melhor migration pra GO
+	// Remove auto migrate and later see which is the best migration for GO
 	db.AutoMigrate(&entity.Product{}, &entity.User{})
 
-	log.Println("Conexão com banco estabelecida")
+	log.Println("Database connection established")
 }
 
 func MiddlewareVazio(next http.Handler) http.Handler {

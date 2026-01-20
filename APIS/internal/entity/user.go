@@ -51,7 +51,7 @@ func (u *User) ValidatePassword(password string) bool {
 }
 
 func NewUser(name, email, password string) (*User, error) {
-	// Valida a password antes do hashing
+	// Validate the password before hashing
 	if password == "" {
 		return nil, ErrPasswordRequired
 	}

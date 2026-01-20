@@ -25,7 +25,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterCategoryServiceServer(grpcServer, categoryService)
 
-	// essa linha é so parqa usar o client não é necessaria
+	// this line is just to use the client, it's not necessary
 	reflection.Register(grpcServer)
 
 	lis, err := net.Listen("tcp", ":50051")

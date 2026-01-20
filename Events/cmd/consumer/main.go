@@ -18,6 +18,6 @@ func main() {
 	go rabbitmq.Consume(ch, "minha-fila", msgs)
 	for msg := range msgs {
 		fmt.Println(string(msg.Body))
-		msg.Ack(false) // Requeu = false, pra não colocar ela de volta na fila
+		msg.Ack(false) // Requeue = false, so it doesn't put it back in the queue
 	}
 }
