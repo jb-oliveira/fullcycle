@@ -19,7 +19,7 @@ func teste() (string, bool) {
 func main() {
 
 	joao := Cliente{
-		Nome:  "João",
+		Nome:  "John",
 		Ativo: true,
 	}
 	joao = joao.Desativar()
@@ -39,5 +39,5 @@ func main() {
 }
 
 func show(t interface{}) {
-	fmt.Printf("O tipo é: %T e o valor é: %v\n", t, t)
+	fmt.Printf("The type is: %T and the value is: %v\n", t, t)
 }

@@ -3,18 +3,18 @@ package entity
 import "errors"
 
 var (
-	ErrIDRequired   = errors.New("ID é obrigatório e deve ser válido")
-	ErrNameRequired = errors.New("nome é obrigatório")
-	ErrNameTooLong  = errors.New("nome não pode exceder 255 caracteres")
+	ErrIDRequired   = errors.New("ID is required and must be valid")
+	ErrNameRequired = errors.New("name is required")
+	ErrNameTooLong  = errors.New("name cannot exceed 255 characters")
 )
 
 var (
-	ErrInvalidPrice = errors.New("preço do produto deve ser maior que zero")
+	ErrInvalidPrice = errors.New("product price must be greater than zero")
 )
 
 var (
-	ErrEmailRequired    = errors.New("email é obrigatório")
-	ErrEmailTooLong     = errors.New("email não pode exceder 255 caracteres")
-	ErrPasswordRequired = errors.New("senha é obrigatória")
-	ErrPasswordTooLong  = errors.New("senha não pode exceder 255 caracteres")
+	ErrEmailRequired    = errors.New("email is required")
+	ErrEmailTooLong     = errors.New("email cannot exceed 255 characters")
+	ErrPasswordRequired = errors.New("password is required")
+	ErrPasswordTooLong  = errors.New("password cannot exceed 255 characters")
 )

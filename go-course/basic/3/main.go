@@ -9,23 +9,23 @@ func main() {
 	salaryMake["Bosco"] = 4.5
 	salaryMake["Oliveira"] = 78.5
 	for k, v := range salaryMake {
-		fmt.Printf("O salario de %s é de %f\n", k, v)
+		fmt.Printf("The salary of %s is %f\n", k, v)
 	}
 	for _, v := range salaryMake {
-		fmt.Printf("O salario é de %v\n", v)
+		fmt.Printf("The salary is %v\n", v)
 	}
 	for k := range salaryMake {
-		fmt.Printf("O nome é de %v\n", k)
+		fmt.Printf("The name is %v\n", k)
 	}
 
 	salary := map[string]float64{
-		"João":  12.3,
+		"John":  12.3,
 		"Bosco": 34.6}
 
-	fmt.Println(salary["João"])
-	fmt.Println(salary["João22"])
-	delete(salary, "João")
-	fmt.Println(salary["João"])
+	fmt.Println(salary["John"])
+	fmt.Println(salary["John22"])
+	delete(salary, "John")
+	fmt.Println(salary["John"])
 	salary["Joao"] = 56.7
 	fmt.Println(salary["Joao"])
 

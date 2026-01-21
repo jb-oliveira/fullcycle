@@ -2,5 +2,5 @@ go 1.25.4
 
 use (
 	./math
-	./sistema
+	./system
 )

@@ -5,7 +5,7 @@ func main() {
 	canal := make(chan string)
 
 	go func() {
-		canal <- "Olá Mundo!"
+		canal <- "Hello World!"
 	}()
 
 	msg := <-canal

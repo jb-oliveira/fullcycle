@@ -10,7 +10,7 @@ func main() {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Ola mmundo"))
+	w.Write([]byte("Hello world"))
 }
 
 type Blog struct {

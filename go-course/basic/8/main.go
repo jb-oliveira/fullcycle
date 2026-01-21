@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	mat "github.com/jb-oliveira/fullcycle/tree/main/curso-go/8/matematica"
+	mat "github.com/jb-oliveira/fullcycle/tree/main/curso-go/basic/8/math"
 )
 
 func main() {
 
-	s := mat.Soma(1, 2)
+	s := mat.Sum(1, 2)
 	println(s)
 	val, err := uuid.NewV7()
 	if err != nil {

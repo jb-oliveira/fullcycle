@@ -4,8 +4,8 @@ import "fmt"
 
 func main() {
 
-	fmt.Println("Primeira Linha")
-	defer fmt.Println("Segunda Linha")
-	defer fmt.Println("Terceira Linha")
+	fmt.Println("First Line")
+	defer fmt.Println("Second Line")
+	defer fmt.Println("Third Line")
 	fmt.Println("Quarta Linha")
 }

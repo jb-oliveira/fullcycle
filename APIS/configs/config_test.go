@@ -668,8 +668,8 @@ DB_NAME=testdb`)
 	if dsn != "" {
 		t.Errorf("GetDSN() expected empty string for unsupported driver, got %v", dsn)
 	}
-	if err != nil && err.Error() != "driver de banco não suportado: mongodb" {
-		t.Errorf("GetDSN() error message = %v, want 'driver de banco não suportado: mongodb'", err.Error())
+	if err != nil && err.Error() != "unsupported database driver: mongodb" {
+		t.Errorf("GetDSN() error message = %v, want 'unsupported database driver: mongodb'", err.Error())
 	}
 }
 

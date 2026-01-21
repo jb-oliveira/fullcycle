@@ -18,6 +18,6 @@ func main() {
 	// }
 
 	for v := range slice {
-		fmt.Printf("O Valor é: %d\n", v)
+		fmt.Printf("The value is: %d\n", v)
 	}
 }
