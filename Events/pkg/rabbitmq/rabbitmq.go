@@ -525,7 +525,7 @@ func (cm *ConnectionManager) GetExchange() (string, string) {
 	return cm.exchangeName, cm.exchangeType
 }
 
-// CURSO:  Legacy functions for backward compatibility
+// COURSE: Legacy functions for backward compatibility
 func OpenChannel() (*amqp.Channel, error) {
 	conn, err := amqp.Dial("amqp://admin:password@localhost:5672/")
 	if err != nil {

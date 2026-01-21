@@ -32,7 +32,7 @@ func TestCalculateTaxAndSave(t *testing.T) {
 	// the Once indicates that it can only be called once with this parameter
 	repository.On("Save", 10.0).Return(nil).Once()
 	repository.On("Save", 0.0).Return(errors.New("Error saving to database"))
-	// repository.On("Save", mock.Anything).Return(errors.New("Erro salvando no banco de dados"))
+	// repository.On("Save", mock.Anything).Return(errors.New("Error saving to database"))
 
 	// The test is likely failing because CalculateTaxAndSave calculates tax first
 	// For amount 10.0, the calculated tax would be 0.1 (10.0 * 0.01), not 10.0

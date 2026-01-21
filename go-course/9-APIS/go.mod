@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/curso-go/9-APIS
+module github.com/jb-oliveira/fullcycle/tree/main/go-course/9-APIS
 
 go 1.25.4
 

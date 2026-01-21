@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/curso-go/packaging/workspace/system
+module github.com/jb-oliveira/fullcycle/tree/main/go-course/packaging/workspace/system
 
 go 1.25.4
 

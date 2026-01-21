@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/curso-go/database/gorm2
+module github.com/jb-oliveira/fullcycle/tree/main/go-course/database/gorm2
 
 go 1.25.4
 

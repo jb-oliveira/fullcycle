@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/curso-go/database/sql_puro
+module github.com/jb-oliveira/fullcycle/tree/main/go-course/database/sql_puro
 
 go 1.25.4
 

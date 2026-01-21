@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/jb-oliveira/fullcycle/tree/main/curso-go/packaging/start/math"
+	"github.com/jb-oliveira/fullcycle/tree/main/go-course/packaging/start/math"
 )
 
 func main() {

@@ -7,25 +7,25 @@ import (
 	"strings"
 )
 
-type Curso struct {
+type Course struct {
 	Nome         string
 	CargaHoraria int
 }
 
-type Cursos []Curso
+type Courses []Course
 
 func MyUpper(s string) string {
 	return strings.ToUpper(s)
 }
 
 func main() {
-	// curso := Curso{"GO", 40}
-	// tmp := template.New("CursoTemplate")
-	// tmp, err := tmp.Parse("Curso: {{.Nome}} - Carga Horaria {{.CargaHoraria}}")
+	// course := Course{"GO", 40}
+	// tmp := template.New("CourseTemplate")
+	// tmp, err := tmp.Parse("Course: {{.Nome}} - Carga Horaria {{.CargaHoraria}}")
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// err = tmp.Execute(os.Stdout, curso)
+	// err = tmp.Execute(os.Stdout, course)
 	// if err != nil {
 	// 	panic(err)
 	// }
@@ -37,7 +37,7 @@ func main() {
 	}
 	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 	// 	t := template.Must(template.New("content.html").ParseFiles(templates...))
-	// 	err := t.Execute(w, Cursos{
+	// 	err := t.Execute(w, Courses{
 	// 		{"GO", 40},
 	// 		{"Java", 40},
 	// 		{"Python", 50},
@@ -51,7 +51,7 @@ func main() {
 	t := template.New("content.html")
 	t.Funcs(template.FuncMap{"MyUpper": MyUpper})
 	t = template.Must(t.ParseFiles(templates...))
-	err := t.Execute(os.Stdout, Cursos{
+	err := t.Execute(os.Stdout, Courses{
 		{"GO", 40},
 		{"Java", 40},
 		{"Python", 50},
