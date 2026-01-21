@@ -23,29 +23,29 @@ type UuidModel struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-type Categoria struct {
+type Category struct {
 	UuidModel
 	Name     string
-	Produtos []Produto
+	Products []Product
 }
 
-func (Categoria) TableName() string {
+func (Category) TableName() string {
 	return "catalogo.categorias"
 }
 
-type Produto struct {
+type Product struct {
 	UuidModel
 	Name         string
 	Price        float64
-	CategoriaID  uuid.UUID
-	Categoria    Categoria
-	NumeroSerial SerialNumber
+	CategoryID   uuid.UUID
+	Category     Category
+	SerialNumber SerialNumber
 }
 
 type SerialNumber struct {
 	gorm.Model
 	Number    string
-	ProdutoID uuid.UUID
+	ProductID uuid.UUID
 }
 
 func (SerialNumber) TableName() string {
@@ -67,7 +67,7 @@ func (SerialNumber) TableName() string {
 // 	return nil
 // }
 
-func (Produto) TableName() string {
+func (Product) TableName() string {
 	return "catalogo.produtos"
 }
 
@@ -100,60 +100,60 @@ func main() {
 	ctx := context.Background()
 
 	// Migrate the schema
-	// err = db.AutoMigrate(&Categoria{}, &Produto{}, &SerialNumber{})
+	// err = db.AutoMigrate(&Category{}, &Product{}, &SerialNumber{})
 	// if err != nil {
 	// 	panic(err)
 	// }
 
-	// prod := criaCategoriaEProduto(db, ctx, "Categoria 1", "Produto 1", 34.87)
+	// prod := createCategoryAndProduct(db, ctx, "Category 1", "Product 1", 34.87)
 
 	// gorm.G[SerialNumber](db).Create(ctx, &SerialNumber{
 	// 	Number:    "12345",
-	// 	ProdutoID: prod.ID,
+	// 	ProductID: prod.ID,
 	// })
 
-	//testaProduto(db, ctx)
+	//testProduct(db, ctx)
 
-	// cats, err := gorm.G[Categoria](db).Find(ctx)
+	// cats, err := gorm.G[Category](db).Find(ctx)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// for i := range 10 {
-	// 	produto := Produto{Name: fmt.Sprintf("Produto : %d", i), Price: 100.45, CategoriaID: cats[0].ID}
-	// 	err = gorm.G[Produto](db).Create(ctx, &produto)
+	// 	product := Product{Name: fmt.Sprintf("Product : %d", i), Price: 100.45, CategoryID: cats[0].ID}
+	// 	err = gorm.G[Product](db).Create(ctx, &product)
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}
 	// }
 
-	// categorias, err := gorm.G[Categoria](db).
-	// 	Preload("Produtos", nil).
-	// 	Preload("Produtos.NumeroSerial", nil).
+	// categories, err := gorm.G[Category](db).
+	// 	Preload("Products", nil).
+	// 	Preload("Products.SerialNumber", nil).
 	// 	Find(ctx)
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// for _, cat := range categorias {
-	// 	fmt.Printf("Categoria: %s", cat.Name)
-	// 	for _, p := range cat.Produtos {
-	// 		fmt.Printf("-- Produto = %s, NumeroSerial = %s \n", p.Name, p.NumeroSerial.Number)
+	// for _, cat := range categories {
+	// 	fmt.Printf("Category: %s", cat.Name)
+	// 	for _, p := range cat.Products {
+	// 		fmt.Printf("-- Product = %s, SerialNumber = %s \n", p.Name, p.SerialNumber.Number)
 	// 	}
 	// }
 
-	prods, err := gorm.G[Produto](db).
-		Joins(clause.Has("Categoria"), nil).
-		Joins(clause.Has("NumeroSerial"), nil).
+	prods, err := gorm.G[Product](db).
+		Joins(clause.Has("Category"), nil).
+		Joins(clause.Has("SerialNumber"), nil).
 		Find(ctx)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Total produtos %d", len(prods))
+	fmt.Printf("Total products %d", len(prods))
 
-	// err = gorm.G[Produto](db).
-	// 	Joins(clause.InnerJoin.Association("Categoria"), nil).
-	// 	Joins(clause.InnerJoin.Association("NumeroSerial"), nil).
-	// 	FindInBatches(ctx, 10000, func(data []Produto, batch int) error {
-	// 		fmt.Printf("Total de produtos: %d", len(data))
+	// err = gorm.G[Product](db).
+	// 	Joins(clause.InnerJoin.Association("Category"), nil).
+	// 	Joins(clause.InnerJoin.Association("SerialNumber"), nil).
+	// 	FindInBatches(ctx, 10000, func(data []Product, batch int) error {
+	// 		fmt.Printf("Total products: %d", len(data))
 	// 		for _, prod := range data {
 	// 			str := prod.ID.String()
 	// 			if str == "" {
@@ -166,48 +166,48 @@ func main() {
 	// 	panic(err)
 	// }
 
-	// produto := Produto{Name: "Teste 5", Price: 1234.78}
+	// product := Product{Name: "Test 5", Price: 1234.78}
 
-	// err = gorm.G[Produto](db).Create(ctx, &produto)
+	// err = gorm.G[Product](db).Create(ctx, &product)
 	// if err != nil {
 	// 	panic(err)
 	// }
 
-	// produtos := []Produto{
-	// 	{Name: "Teste 5", Price: 1234.78},
-	// 	{Name: "Teste 6", Price: 234.78},
-	// 	{Name: "Teste 7", Price: 110.78},
-	// 	{Name: "Teste 8", Price: 9756.78},
+	// products := []Product{
+	// 	{Name: "Test 5", Price: 1234.78},
+	// 	{Name: "Test 6", Price: 234.78},
+	// 	{Name: "Test 7", Price: 110.78},
+	// 	{Name: "Test 8", Price: 9756.78},
 	// }
 
-	// produto := Produto{
-	// 	Name:  "teste",
+	// product := Product{
+	// 	Name:  "test",
 	// 	Price: 13.89,
 	// }
 
-	// err = gorm.G[Produto](db).CreateInBatches(ctx, &produtos, 100)
+	// err = gorm.G[Product](db).CreateInBatches(ctx, &products, 100)
 	// if err != nil {
 	// 	panic(err)
 	// }
 
-	// var produtos []Produto
+	// var products []Product
 	// min := 1.0
 	// max := 1000.0
 	// for i := range 505 {
-	// 	produtos = append(produtos, Produto{Name: fmt.Sprintf("Produto: %d", i), Price: min + rand.Float64()*(max-min)})
+	// 	products = append(products, Product{Name: fmt.Sprintf("Product: %d", i), Price: min + rand.Float64()*(max-min)})
 	// }
-	// gorm.G[Produto](db).CreateInBatches(ctx, &produtos, 100)
+	// gorm.G[Product](db).CreateInBatches(ctx, &products, 100)
 
 	// batchSize := 50
 	// batchCount := 0
-	// err = gorm.G[Produto](db).FindInBatches(ctx, batchSize, func(data []Produto, batch int) error {
+	// err = gorm.G[Product](db).FindInBatches(ctx, batchSize, func(data []Product, batch int) error {
 	// 	batchCount = batch // Keep track of the current batch number
 
 	// 	fmt.Printf("--- Processing Batch %d (Records %d to %d) ---\n", batch, (batch-1)*batchSize+1, ((batch-1)*batchSize)+len(data))
 
 	// 	// Iterate over the records in the current batch
 	// 	for _, p := range data {
-	// 		fmt.Printf("Produto ID: %s, Name: %s\n", p.ID, p.Name)
+	// 		fmt.Printf("Product ID: %s, Name: %s\n", p.ID, p.Name)
 	// 		// You can perform your processing logic here (e.g., update a field, send an email)
 	// 	}
 
@@ -220,7 +220,7 @@ func main() {
 	// fmt.Printf("Batch count: %d\n", batchCount)
 
 	// Read
-	// product, err := gorm.G[Produto](db).Where("id = ?", "019a88e9-fdd3-7cf1-91d2-b4a2d3f7ca8e").First(ctx) // find product with integer primary key
+	// product, err := gorm.G[Product](db).Where("id = ?", "019a88e9-fdd3-7cf1-91d2-b4a2d3f7ca8e").First(ctx) // find product with integer primary key
 	// if err == gorm.ErrRecordNotFound {
 	// 	fmt.Println("Record not found for the given ID.")
 	// 	// You can implement specific logic here, like returning a 404 error in an API,
@@ -230,7 +230,7 @@ func main() {
 	// 	fmt.Printf("An unexpected error occurred: %v\n", err)
 	// } else {
 	// 	// Record found, proceed with using the 'user' object
-	// 	fmt.Printf("Found produto: %s (Nome: %d)\n", product.ID, product.Name)
+	// 	fmt.Printf("Found product: %s (Name: %d)\n", product.ID, product.Name)
 	// }
 
 	//   products, err := gorm.G[Product](db).Where("code = ?", "D42").Find(ctx) // find product with code D42
@@ -241,7 +241,7 @@ func main() {
 	//   err = gorm.G[Product](db).Where("id = ?", product.ID).Updates(ctx, Product{Code: "D42", Price: 100})
 
 	//   // Delete - delete product
-	// rowCount, err := gorm.G[Produto](db).Where("id = ?", product.ID).Delete(ctx)
+	// rowCount, err := gorm.G[Product](db).Where("id = ?", product.ID).Delete(ctx)
 	// if err != nil {
 	// 	panic(err)
 	// }
@@ -253,28 +253,28 @@ func main() {
 
 }
 
-func testaProduto(db *gorm.DB, ctx context.Context) {
+func testProduct(db *gorm.DB, ctx context.Context) {
 
-	// carrega a categoria eager
-	produtos, err := gorm.G[Produto](db).Preload("Categoria", nil).Preload("NumeroSerial", nil).Find(ctx)
+	// load the category eager
+	products, err := gorm.G[Product](db).Preload("Category", nil).Preload("SerialNumber", nil).Find(ctx)
 	if err != nil {
 		panic(err)
 	}
-	for _, p := range produtos {
-		fmt.Printf("Categoria: %s\n", p.Name)
+	for _, p := range products {
+		fmt.Printf("Category: %s\n", p.Name)
 	}
 }
 
-func criaCategoriaEProduto(db *gorm.DB, ctx context.Context, nomeCategoria, nomeProduto string, preco float64) *Produto {
-	categoria := Categoria{Name: nomeCategoria}
+func createCategoryAndProduct(db *gorm.DB, ctx context.Context, categoryName, productName string, price float64) *Product {
+	category := Category{Name: categoryName}
 
-	gorm.G[Categoria](db).Create(ctx, &categoria)
+	gorm.G[Category](db).Create(ctx, &category)
 
-	produto := Produto{
-		Name:        nomeProduto,
-		Price:       preco,
-		CategoriaID: categoria.ID,
+	product := Product{
+		Name:       productName,
+		Price:      price,
+		CategoryID: category.ID,
 	}
-	gorm.G[Produto](db).Create(ctx, &produto)
-	return &produto
+	gorm.G[Product](db).Create(ctx, &product)
+	return &product
 }

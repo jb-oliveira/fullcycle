@@ -39,7 +39,7 @@ func main() {
 	close(ch2)
 }
 
-func loadDataFromUrl(url string, conversor ConversorCep, ch chan<- Cep) {
+func loadDataFromUrl(url string, converter CepConverter, ch chan<- Cep) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Default().Printf("Error creating request: %v\n", url)
@@ -59,26 +59,26 @@ func loadDataFromUrl(url string, conversor ConversorCep, ch chan<- Cep) {
 		log.Default().Println(err)
 		return
 	}
-	err = json.Unmarshal(body, &conversor)
+	err = json.Unmarshal(body, &converter)
 	if err != nil {
 		log.Default().Printf("Error parsing JSON: %v\n", string(body))
 		log.Default().Println(err)
 		return
 	}
-	ch <- conversor.ToCep()
+	ch <- converter.ToCep()
 }
 
 type ViaCep struct {
-	Cep         string `json:"cep"`
-	Logradouro  string `json:"logradouro"`
-	Complemento string `json:"complemento"`
-	Bairro      string `json:"bairro"`
-	Localidade  string `json:"localidade"`
-	Uf          string `json:"uf"`
-	Ibge        string `json:"ibge"`
-	Gia         string `json:"gia"`
-	Ddd         string `json:"ddd"`
-	Siafi       string `json:"siafi"`
+	Cep        string `json:"cep"`
+	Street     string `json:"logradouro"`
+	Complement string `json:"complemento"`
+	District   string `json:"bairro"`
+	City       string `json:"localidade"`
+	Uf         string `json:"uf"`
+	Ibge       string `json:"ibge"`
+	Gia        string `json:"gia"`
+	Ddd        string `json:"ddd"`
+	Siafi      string `json:"siafi"`
 }
 
 type BrasilApiCep struct {
@@ -91,36 +91,36 @@ type BrasilApiCep struct {
 }
 
 type Cep struct {
-	Cep        string `json:"cep"`
-	Logradouro string `json:"logradouro"`
-	Bairro     string `json:"bairro"`
-	Cidade     string `json:"cidade"`
-	Uf         string `json:"uf"`
-	Api        string `json:"api"`
+	Cep      string `json:"cep"`
+	Street   string `json:"logradouro"`
+	District string `json:"bairro"`
+	City     string `json:"cidade"`
+	Uf       string `json:"uf"`
+	Api      string `json:"api"`
 }
 
-type ConversorCep interface {
+type CepConverter interface {
 	ToCep() Cep
 }
 
 func (v *ViaCep) ToCep() Cep {
 	return Cep{
-		Cep:        v.Cep,
-		Logradouro: v.Logradouro,
-		Bairro:     v.Bairro,
-		Cidade:     v.Localidade,
-		Uf:         v.Uf,
-		Api:        "ViaCep",
+		Cep:      v.Cep,
+		Street:   v.Street,
+		District: v.District,
+		City:     v.City,
+		Uf:       v.Uf,
+		Api:      "ViaCep",
 	}
 }
 
 func (b *BrasilApiCep) ToCep() Cep {
 	return Cep{
-		Cep:        b.Cep,
-		Logradouro: b.Street,
-		Bairro:     b.Neighborhood,
-		Cidade:     b.City,
-		Uf:         b.State,
-		Api:        "BrasilApi",
+		Cep:      b.Cep,
+		Street:   b.Street,
+		District: b.Neighborhood,
+		City:     b.City,
+		Uf:       b.State,
+		Api:      "BrasilApi",
 	}
 }

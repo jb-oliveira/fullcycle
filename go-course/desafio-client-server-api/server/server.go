@@ -61,7 +61,7 @@ type UrlResponse struct {
 	Bid string `json:"bid"`
 }
 
-func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
+func SearchDollarHandler(w http.ResponseWriter, r *http.Request) {
 	request, err := loadDataFromUrl()
 	if err != nil {
 		log.Println("Error consulting url", err)
@@ -117,6 +117,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.HandleFunc("/cotacao", BuscaDolarHandler)
+	http.HandleFunc("/cotacao", SearchDollarHandler)
 	http.ListenAndServe(":8080", nil)
 }

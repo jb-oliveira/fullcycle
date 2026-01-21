@@ -9,19 +9,19 @@ import (
 )
 
 type ViaCep struct {
-	Cep         string `json:"cep"`
-	Logradouro  string `json:"logradouro"`
-	Complemento string `json:"complemento"`
-	Unidade     string `json:"unidade"`
-	Bairro      string `json:"bairro"`
-	Localidade  string `json:"localidade"`
-	Uf          string `json:"uf"`
-	Estado      string `json:"estado"`
-	Regiao      string `json:"regiao"`
-	Ibge        string `json:"ibge"`
-	Gia         string `json:"gia"`
-	Ddd         string `json:"ddd"`
-	Siafi       string `json:"siafi"`
+	Cep        string `json:"cep"`
+	Street     string `json:"logradouro"`
+	Complement string `json:"complemento"`
+	Unit       string `json:"unidade"`
+	District   string `json:"bairro"`
+	City       string `json:"localidade"`
+	Uf         string `json:"uf"`
+	State      string `json:"estado"`
+	Region     string `json:"regiao"`
+	Ibge       string `json:"ibge"`
+	Gia        string `json:"gia"`
+	Ddd        string `json:"ddd"`
+	Siafi      string `json:"siafi"`
 }
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error creating file: %v\n", err)
 		}
 		defer file.Close()
-		_, err = file.WriteString(fmt.Sprintf("UF: %s, Cidade: %s, Bairro: %s,  Rua: %s", data.Uf, data.Localidade, data.Bairro, data.Logradouro))
+		_, err = file.WriteString(fmt.Sprintf("UF: %s, City: %s, District: %s, Street: %s", data.Uf, data.City, data.District, data.Street))
 
 	}
 }

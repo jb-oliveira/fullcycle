@@ -20,11 +20,11 @@ func main() {
 	executeGet()
 	executePost()
 	customRequest()
-	contexto()
+	contextExample()
 
 }
 
-func contexto() {
+func contextExample() {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()

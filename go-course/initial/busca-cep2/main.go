@@ -7,27 +7,27 @@ import (
 )
 
 type ViaCep struct {
-	Cep         string `json:"cep"`
-	Logradouro  string `json:"logradouro"`
-	Complemento string `json:"complemento"`
-	Unidade     string `json:"unidade"`
-	Bairro      string `json:"bairro"`
-	Localidade  string `json:"localidade"`
-	Uf          string `json:"uf"`
-	Estado      string `json:"estado"`
-	Regiao      string `json:"regiao"`
-	Ibge        string `json:"ibge"`
-	Gia         string `json:"gia"`
-	Ddd         string `json:"ddd"`
-	Siafi       string `json:"siafi"`
+	Cep        string `json:"cep"`
+	Street     string `json:"logradouro"`
+	Complement string `json:"complemento"`
+	Unit       string `json:"unidade"`
+	District   string `json:"bairro"`
+	City       string `json:"localidade"`
+	Uf         string `json:"uf"`
+	State      string `json:"estado"`
+	Region     string `json:"regiao"`
+	Ibge       string `json:"ibge"`
+	Gia        string `json:"gia"`
+	Ddd        string `json:"ddd"`
+	Siafi      string `json:"siafi"`
 }
 
 func main() {
-	http.HandleFunc("/", BuscaCepHandler)
+	http.HandleFunc("/", SearchCepHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
-func BuscaCepHandler(w http.ResponseWriter, r *http.Request) {
+func SearchCepHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		w.WriteHeader(http.StatusNotFound)
 		// http.NotFound(w, r)
@@ -38,7 +38,7 @@ func BuscaCepHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	viaCep, err := BuscaCep(cepParam)
+	viaCep, err := SearchCep(cepParam)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -56,7 +56,7 @@ func BuscaCepHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(viaCep)
 }
 
-func BuscaCep(cep string) (*ViaCep, error) {
+func SearchCep(cep string) (*ViaCep, error) {
 	res, err := http.Get("https://viacep.com.br/ws/" + cep + "/json/")
 	if err != nil {
 		return nil, err

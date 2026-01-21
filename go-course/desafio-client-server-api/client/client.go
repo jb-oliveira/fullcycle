@@ -16,28 +16,28 @@ type UrlResponse struct {
 	Bid string `json:"bid"`
 }
 
-func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
+func SearchDollarHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := loadDataFromUrl()
 	if err != nil {
-		log.Println("Error lendo url", err)
+		log.Println("Error reading url", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	dolar, err := strconv.ParseFloat(response.Bid, 64)
+	dollar, err := strconv.ParseFloat(response.Bid, 64)
 	if err != nil {
-		log.Println("Error convertendo string to float64:", err)
+		log.Println("Error converting string to float64:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	f, err := os.Create("cotacao.txt")
 	if err != nil {
-		log.Println("Erro criando arquivo", err)
+		log.Println("Error creating file", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	_, err = f.WriteString(fmt.Sprintf("Dólar: %f", dolar))
+	_, err = f.WriteString(fmt.Sprintf("Dollar: %f", dollar))
 	if err != nil {
-		log.Println("Erro escrevendo arquivo", err)
+		log.Println("Error writing file", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -69,6 +69,6 @@ func loadDataFromUrl() (*UrlResponse, error) {
 }
 
 func main() {
-	http.HandleFunc("/", BuscaDolarHandler)
+	http.HandleFunc("/", SearchDollarHandler)
 	http.ListenAndServe(":8081", nil)
 }
