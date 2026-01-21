@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/APIS
+module github.com/jb-oliveira/fullcycle/APIS
 
 go 1.25.4
 

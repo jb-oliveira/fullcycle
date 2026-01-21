@@ -3,7 +3,7 @@ package entity
 import (
 	"testing"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/pkg/entity"
 	"github.com/stretchr/testify/assert"
 )
 

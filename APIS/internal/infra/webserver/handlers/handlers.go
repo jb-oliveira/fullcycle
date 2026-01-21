@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/dto"
 )
 
 func ReturnHttpError(w http.ResponseWriter, err error, code int) {

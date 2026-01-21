@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/jb-oliveira/fullcycle/13-GRAPHQL/internal/database"
+import "github.com/jb-oliveira/fullcycle/GRAPHQL/internal/database"
 
 // This file will not be regenerated automatically.
 //

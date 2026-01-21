@@ -7,11 +7,11 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
-	entityPkg "github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/log"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/dto"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/infra/database"
+	entityPkg "github.com/jb-oliveira/fullcycle/APIS/pkg/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/pkg/log"
 )
 
 type ProductHandler struct {

@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
 )
 
 type User struct {

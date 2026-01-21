@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/pkg/entity"
 )
 
 type Product struct {

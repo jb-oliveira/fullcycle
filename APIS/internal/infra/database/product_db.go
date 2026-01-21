@@ -6,8 +6,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
-	pkgEntity "github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
+	pkgEntity "github.com/jb-oliveira/fullcycle/APIS/pkg/entity"
 )
 
 type Product struct {

@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/pkg/log"
+	"github.com/jb-oliveira/fullcycle/APIS/pkg/log"
 
 	"github.com/go-chi/jwtauth"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/dto"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/dto"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/infra/database"
 )
 
 type UserHandler struct {

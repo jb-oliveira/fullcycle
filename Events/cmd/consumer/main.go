@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/11-EVENTOS/pkg/rabbitmq"
+	"github.com/jb-oliveira/fullcycle/Events/pkg/rabbitmq"
 	ampq "github.com/rabbitmq/amqp091-go"
 )
 

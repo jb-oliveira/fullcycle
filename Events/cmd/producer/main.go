@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/11-EVENTOS/pkg/rabbitmq"
+	"github.com/jb-oliveira/fullcycle/Events/pkg/rabbitmq"
 )
 
 func main() {

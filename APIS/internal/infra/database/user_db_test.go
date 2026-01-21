@@ -3,7 +3,7 @@ package database
 import (
 	"testing"
 
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/sqlite"

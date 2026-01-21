@@ -8,7 +8,7 @@ package graph
 import (
 	"context"
 
-	"github.com/jb-oliveira/fullcycle/13-GRAPHQL/graph/model"
+	"github.com/jb-oliveira/fullcycle/GRAPHQL/graph/model"
 )
 
 // Courses is the resolver for the courses field.

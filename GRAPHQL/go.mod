@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/13-GRAPHQL
+module github.com/jb-oliveira/fullcycle/GRAPHQL
 
 go 1.25.5
 

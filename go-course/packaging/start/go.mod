@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/go-course/packaging/start
+module github.com/jb-oliveira/fullcycle/go-course/packaging/start
 
 go 1.25.4
 

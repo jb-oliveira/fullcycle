@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/go-course/challenge-client-server-api/server
+module github.com/jb-oliveira/fullcycle/go-course/challenge-client-server-api/server
 
 go 1.25.4
 

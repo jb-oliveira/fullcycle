@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/11-EVENTOS
+module github.com/jb-oliveira/fullcycle/Events
 
 go 1.25.5
 

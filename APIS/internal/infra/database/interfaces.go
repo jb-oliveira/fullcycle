@@ -1,6 +1,6 @@
 package database
 
-import "github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
+import "github.com/jb-oliveira/fullcycle/APIS/internal/entity"
 
 type UserInterface interface {
 	Create(user *entity.User) error

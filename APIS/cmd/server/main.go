@@ -8,12 +8,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/httplog/v2"
 	"github.com/go-chi/jwtauth"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/configs"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/entity"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/database"
-	"github.com/jb-oliveira/fullcycle/tree/main/APIS/internal/infra/webserver/handlers"
+	"github.com/jb-oliveira/fullcycle/APIS/configs"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/entity"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/infra/database"
+	"github.com/jb-oliveira/fullcycle/APIS/internal/infra/webserver/handlers"
 
-	_ "github.com/jb-oliveira/fullcycle/tree/main/APIS/docs"
+	_ "github.com/jb-oliveira/fullcycle/APIS/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

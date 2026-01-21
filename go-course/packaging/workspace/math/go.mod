@@ -1,3 +1,3 @@
-module github.com/jb-oliveira/fullcycle/tree/main/go-course/packaging/workspace/math
+module github.com/jb-oliveira/fullcycle/go-course/packaging/workspace/math
 
 go 1.25.4

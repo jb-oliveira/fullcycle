@@ -11,8 +11,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/jb-oliveira/fullcycle/13-GRAPHQL/graph"
-	"github.com/jb-oliveira/fullcycle/13-GRAPHQL/internal/database"
+	"github.com/jb-oliveira/fullcycle/GRAPHQL/graph"
+	"github.com/jb-oliveira/fullcycle/GRAPHQL/internal/database"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/vektah/gqlparser/v2/ast"
 )
