@@ -1,4 +1,4 @@
-module github.com/jb-oliveira/fullcycle/tree/main/curso-go/8
+module github.com/jb-oliveira/fullcycle/curso-go/basic/8
 
 go 1.25.3
 
