@@ -21,7 +21,7 @@ type Cliente struct {
 	Address Endereco
 }
 
-func (c Cliente) Desativar() {
+func (c *Cliente) Desativar() {
 	c.Ativo = false
 }
 
@@ -38,7 +38,7 @@ func main() {
 	joao.Cidade = "São Paulo"
 	joao.Endereco.Cidade = "Recife"
 	// joao.Desativar()
-	Desativacao(joao)
+	Desativacao(&joao)
 
 	fmt.Printf("Nome: %s, Idade: %d, Ativo: %t\n", joao.Nome, joao.Idade, joao.Ativo)
 	fmt.Printf("Cliente: %v\n", joao)

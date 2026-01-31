@@ -4,11 +4,25 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
+
+var enviroment string
+
+type RunEFunc func(cmd *cobra.Command, args []string) error
+
+func GetDB() *sql.DB {
+	db, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		panic(err)
+	}
+	db.Exec(`CREATE TABLE IF NOT EXISTS categories (id VARCHAR(255) PRIMARY KEY, name VARCHAR(255), description VARCHAR(255))`)
+	return db
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -29,8 +43,7 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-	env, _ := rootCmd.Flags().GetString("env")
-	fmt.Printf("env: %s\n", env)
+	fmt.Printf("env: %s\n", enviroment)
 }
 
 func init() {
@@ -44,6 +57,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	rootCmd.Flags().StringP("env", "e", "", "Execution environment")
+	// cria a --env e -e com valor default TEST
+	rootCmd.PersistentFlags().StringVarP(&enviroment, "env", "e", "TEST", "Execution environment")
 	rootCmd.MarkFlagRequired("env")
 }

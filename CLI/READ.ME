@@ -19,3 +19,16 @@ cobra-cli add ping
 ```bash
 rm cmd/ping.go
 ```
+
+# para adicionar um sub comando create no ping
+
+```bash
+cobra-cli add create -p 'pingCmd'
+```
+
+# A diferença entre flags e persistent flags
+
+as persistent flags são globais para todos os comandos
+ja as flags são apenas para o comando em que foram declaradas
+
+# quando usar o metodo StringP ele cria uma flag e um atalho
