@@ -1,0 +1,24 @@
+## Migrations
+
+# Golang-migrate 
+
+https://github.com/golang-migrate/migrate
+
+Instalar
+https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+
+
+migrate create -ext=sql -dir=db/migrations -seq init
+
+# pra rodar as migrations
+migrate -path=db/migrations -database "postgres://postgres:password@localhost:5432/myapp?sslmode=disable" up
+
+
+# pacote SQLX
+https://github.com/jmoiron/sqlx
+
+
+# pacote SQLC
+```
+go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+```
