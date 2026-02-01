@@ -54,3 +54,16 @@ VALUES ($1, $2, $3);
 insert into courses (id, category_id, name, description, price)
 values ($1,$2,$3,$4,$5)
 RETURNING id, category_id, name, description, price;
+
+-- name: ListCoursesWithCategoryName :many
+SELECT c.id, c.category_id, c.name, c.description, c.price, ca.name as category_name
+FROM courses c
+JOIN categories ca ON c.category_id = ca.id
+ORDER BY c.name ASC;
+
+-- name: ListCoursesWithCategory :many
+SELECT c.id, c.category_id, c.name, c.description, c.price, 
+        ca.name as category_name, ca.description as category_description
+FROM courses c
+JOIN categories ca ON c.category_id = ca.id
+ORDER BY c.name ASC;

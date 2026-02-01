@@ -159,6 +159,95 @@ func (q *Queries) ListCategories(ctx context.Context, arg ListCategoriesParams) 
 	return items, nil
 }
 
+const listCoursesWithCategory = `-- name: ListCoursesWithCategory :many
+SELECT c.id, c.category_id, c.name, c.description, c.price, 
+        ca.name as category_name, ca.description as category_description
+FROM courses c
+JOIN categories ca ON c.category_id = ca.id
+ORDER BY c.name ASC
+`
+
+type ListCoursesWithCategoryRow struct {
+	ID                  string
+	CategoryID          string
+	Name                string
+	Description         pgtype.Text
+	Price               pgtype.Numeric
+	CategoryName        string
+	CategoryDescription pgtype.Text
+}
+
+func (q *Queries) ListCoursesWithCategory(ctx context.Context) ([]ListCoursesWithCategoryRow, error) {
+	rows, err := q.db.Query(ctx, listCoursesWithCategory)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCoursesWithCategoryRow
+	for rows.Next() {
+		var i ListCoursesWithCategoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CategoryID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.CategoryName,
+			&i.CategoryDescription,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCoursesWithCategoryName = `-- name: ListCoursesWithCategoryName :many
+SELECT c.id, c.category_id, c.name, c.description, c.price, ca.name as category_name
+FROM courses c
+JOIN categories ca ON c.category_id = ca.id
+ORDER BY c.name ASC
+`
+
+type ListCoursesWithCategoryNameRow struct {
+	ID           string
+	CategoryID   string
+	Name         string
+	Description  pgtype.Text
+	Price        pgtype.Numeric
+	CategoryName string
+}
+
+func (q *Queries) ListCoursesWithCategoryName(ctx context.Context) ([]ListCoursesWithCategoryNameRow, error) {
+	rows, err := q.db.Query(ctx, listCoursesWithCategoryName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCoursesWithCategoryNameRow
+	for rows.Next() {
+		var i ListCoursesWithCategoryNameRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CategoryID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.CategoryName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateCategory = `-- name: UpdateCategory :one
 UPDATE categories
 SET name = $2, description = $3

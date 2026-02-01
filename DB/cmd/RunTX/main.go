@@ -29,13 +29,13 @@ func main() {
 			return err
 		}
 
-		for i := 1; i <= 10; i++ {
+		for i := 100; i <= 110; i++ {
 			_, err := queries.CreateCourse(ctx, db.CreateCourseParams{
 				ID:          db.NewIDString(),
 				CategoryID:  category.ID,
 				Name:        fmt.Sprintf("Course %d", i),
 				Description: pgtype.Text{String: fmt.Sprintf("Course %d description", i), Valid: true},
-				Price:       pgtype.Numeric{Int: big.NewInt(100 * int64(i)), Valid: true},
+				Price:       pgtype.Numeric{Int: big.NewInt(int64(i * 89)), Valid: true},
 			})
 			if err != nil {
 				return err

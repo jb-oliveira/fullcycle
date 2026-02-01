@@ -10,3 +10,9 @@ sql:
         package: "db"
         out: "internal/db"
         sql_package: "pgx/v5"
+        # Por algum motivo isso não funciona
+        # overrides:
+        #   - db_type: "numeric"
+        #     go_type: "float64"
+        #   - db_type: "decimal"
+        #     go_type: "float64"
