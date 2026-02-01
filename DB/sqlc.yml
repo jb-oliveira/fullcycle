@@ -2,7 +2,9 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries: "db/queries/query.sql"
-    schema: "db/schema.sql"
+    # schema: "db/schema.sql"
+    # schema: "postgres://postgres:password@localhost:5432/myapp?sslmode=disable"
+    schema: "db/migrations"
     gen:
       go:
         package: "db"
