@@ -1,0 +1,29 @@
+### Google wire
+
+https://github.com/google/wire
+
+### Uber FX
+
+https://github.com/uber-go/fx
+
+
+
+## Using wire
+
+go install github.com/google/wire/cmd/wire@latest
+
+create a file wire.go
+
+# never forget to write this at the top of file
+//go:build wireinject
+// +build wireinject
+
+
+# and to execute run 
+go run .
+
+OR
+
+go run main.go wire_gen.go
+
+NOT JUST go run main.go
