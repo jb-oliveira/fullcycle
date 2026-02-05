@@ -19,8 +19,8 @@ type CourseRepositoryPGImpl struct {
 	queries *db.Queries
 }
 
-func NewCourseRepositoryPGImpl(conn *sql.DB) *CourseRepositoryPGImpl {
-	return &CourseRepositoryPGImpl{queries: db.New(conn)}
+func NewCourseRepositoryPGImpl(dbTX db.DBTX) *CourseRepositoryPGImpl {
+	return &CourseRepositoryPGImpl{queries: db.New(dbTX)}
 }
 
 func (r *CourseRepositoryPGImpl) Create(ctx context.Context, course *entity.Course) error {

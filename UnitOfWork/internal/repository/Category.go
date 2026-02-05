@@ -17,8 +17,8 @@ type CategoryRepositoryPGImpl struct {
 	queries *db.Queries
 }
 
-func NewCategoryRepositoryPGImpl(conn *sql.DB) *CategoryRepositoryPGImpl {
-	return &CategoryRepositoryPGImpl{queries: db.New(conn)}
+func NewCategoryRepositoryPGImpl(dbTX db.DBTX) *CategoryRepositoryPGImpl {
+	return &CategoryRepositoryPGImpl{queries: db.New(dbTX)}
 }
 
 func (r *CategoryRepositoryPGImpl) Create(ctx context.Context, category *entity.Category) error {

@@ -34,7 +34,7 @@ type AddCourseUseCaseImpl struct {
 	CourseRepository   repository.CourseRepository
 }
 
-func NewAddCourseUseCaseImpl(categoryRepository repository.CategoryRepository, courseRepository repository.CourseRepository) *AddCourseUseCaseImpl {
+func NewAddCourseUseCaseImpl(categoryRepository repository.CategoryRepository, courseRepository repository.CourseRepository) AddCourseUseCase {
 	return &AddCourseUseCaseImpl{CategoryRepository: categoryRepository, CourseRepository: courseRepository}
 }
 

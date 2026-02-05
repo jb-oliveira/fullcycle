@@ -2,25 +2,36 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jb-oliveira/fullcycle/UnitOfWork/internal/entity"
 	"github.com/jb-oliveira/fullcycle/UnitOfWork/internal/repository"
+	"github.com/jb-oliveira/fullcycle/UnitOfWork/pkg/uow"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func TestAddCourseUseCase_Execute(t *testing.T) {
+func TestAddCourseUseUowCase_Execute(t *testing.T) {
 	sqlDB, cleanup := setupTestContainer(t)
 	defer cleanup()
 
-	// Initialize repositories
+	uow := uow.NewUnitOfWork(context.Background(), sqlDB)
+
+	uow.Register("category_repository", func(tx *sql.Tx) any {
+		return repository.NewCategoryRepositoryPGImpl(tx)
+	})
+	uow.Register("course_repository", func(tx *sql.Tx) any {
+		return repository.NewCourseRepositoryPGImpl(tx)
+	})
+
+	// Initialize repositories for verification
 	categoryRepo := repository.NewCategoryRepositoryPGImpl(sqlDB)
 	courseRepo := repository.NewCourseRepositoryPGImpl(sqlDB)
 
 	// Initialize use case
-	useCase := NewAddCourseUseCaseImpl(categoryRepo, courseRepo)
+	useCase := NewAddCourseUseUowCaseImpl(uow)
 
 	ctx := context.Background()
 
