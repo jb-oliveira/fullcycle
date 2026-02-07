@@ -1,1 +1,37 @@
 ## CleanArch
+
+# GRPC
+
+ver READ.ME do projeto
+
+# GRAPHQL
+
+instalar o gqlgen:
+
+```bash
+go get github.com/99designs/gqlgen@latest
+
+```
+
+inicializa
+
+```bash
+go run github.com/99designs/gqlgen init
+```
+
+altera as configurações do gqlgen.yml
+
+depois executa a geração do codigo
+
+```bash
+go run github.com/99designs/gqlgen generate
+```
+
+adiciona os use cases no resolver
+
+```go
+resolver.go
+```
+
+se der erro no "go run github.com/99designs/gqlgen generate"
+roda 

@@ -1,0 +1,21 @@
+type OrderOutput {
+  id: ID!
+  price: Float!
+  tax: Float!
+  finalPrice: Float! # Changed to camelCase (GraphQL convention)
+}
+
+input OrderInput { # CHANGED: type to input
+  id: ID!
+  price: Float!
+  tax: Float!
+}
+
+# type Query {
+#   # You need at least one query to make the schema valid
+#   orders: [OrderOutput!]!
+# }
+
+type Mutation {
+  createOrder(input: OrderInput!): OrderOutput!
+}
