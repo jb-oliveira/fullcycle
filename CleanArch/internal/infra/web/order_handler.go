@@ -8,10 +8,10 @@ import (
 )
 
 type OrderHandler struct {
-	CreateOrderUseCase usecase.CreateOrderUseCase
+	CreateOrderUseCase *usecase.CreateOrderUseCase
 }
 
-func NewOrderHandler(createOrderUseCase usecase.CreateOrderUseCase) *OrderHandler {
+func NewOrderHandler(createOrderUseCase *usecase.CreateOrderUseCase) *OrderHandler {
 	return &OrderHandler{CreateOrderUseCase: createOrderUseCase}
 }
 

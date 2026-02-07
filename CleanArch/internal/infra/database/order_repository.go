@@ -6,15 +6,15 @@ import (
 	"github.com/jb-oliveira/fullcycle/CleanArch/internal/entity"
 )
 
-type orderRepositoryPG struct {
+type OrderRepositoryPG struct {
 	db *sql.DB
 }
 
 func NewOrderRepositoryPG(db *sql.DB) entity.OrderRepository {
-	return &orderRepositoryPG{db: db}
+	return &OrderRepositoryPG{db: db}
 }
 
-func (r *orderRepositoryPG) Save(order *entity.Order) error {
+func (r *OrderRepositoryPG) Save(order *entity.Order) error {
 	stmt, err := r.db.Prepare("INSERT INTO orders (id, price, tax) VALUES ($1, $2, $3)")
 	if err != nil {
 		return err

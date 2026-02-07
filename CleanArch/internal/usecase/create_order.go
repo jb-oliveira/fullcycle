@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/jb-oliveira/fullcycle/CleanArch/internal/entity"
-	"github.com/jb-oliveira/fullcycle/CleanArch/internal/event"
+	"github.com/jb-oliveira/fullcycle/CleanArch/pkg/events"
 )
 
 type CreateOrderInput struct {
@@ -20,11 +20,11 @@ type CreateOrderOutput struct {
 
 type CreateOrderUseCase struct {
 	OrderRepository entity.OrderRepository
-	OrderCreated    event.Event
-	EventDispatcher event.EventDispatcher
+	OrderCreated    events.EventInterface
+	EventDispatcher events.EventDispatcherInterface
 }
 
-func NewCreateOrderUseCase(orderRepository entity.OrderRepository, orderCreated event.Event, eventDispatcher event.EventDispatcher) *CreateOrderUseCase {
+func NewCreateOrderUseCase(orderRepository entity.OrderRepository, orderCreated events.EventInterface, eventDispatcher events.EventDispatcherInterface) *CreateOrderUseCase {
 	return &CreateOrderUseCase{
 		OrderRepository: orderRepository,
 		OrderCreated:    orderCreated,
