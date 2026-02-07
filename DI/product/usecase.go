@@ -10,16 +10,16 @@ type InsertProductUseCase interface {
 	Execute(product *ProductInputDto) error
 }
 
-type ProductUseCaseImpl struct {
-	ProductRepository ProductRepository
+type productUseCaseImpl struct {
+	productRepository ProductRepository
 }
 
 func NewProductUseCaseImpl(productRepository ProductRepository) InsertProductUseCase {
-	return &ProductUseCaseImpl{ProductRepository: productRepository}
+	return &productUseCaseImpl{productRepository: productRepository}
 }
 
-func (u *ProductUseCaseImpl) Execute(product *ProductInputDto) error {
-	err := u.ProductRepository.Insert(&Product{
+func (u *productUseCaseImpl) Execute(product *ProductInputDto) error {
+	err := u.productRepository.Insert(&Product{
 		ID:    product.ID,
 		Name:  product.Name,
 		Price: product.Price,
