@@ -1,0 +1,67 @@
+### Deploy in Kubernetes
+
+Cria o Dockerfile
+
+Cria o docker compose 
+
+# pra entrar no container alpine 
+docker compose exec goapp sh
+
+# pra entrar no container normal    
+docker compose exec goapp bash
+
+# buildar sem informações de debug
+# Esse comando tira as informações de debug do binário, deixando ele menor
+go build -ldflags="-w -s" -o main .
+
+
+
+
+# Gera a imagem docker
+
+```bash 
+docker build -t jb-oliveira/k8s:v1 -f Dockerfile.prod .
+```
+
+# Testar a imagem localmente
+```bash
+docker run --rm -p 8080:8080 jb-oliveira/k8s:v1
+```
+
+# pra subir a imagem pro docker 
+docker push jb-oliveira/k8s:v3
+
+### Usando o kind pro kubernetes
+
+# cria o cluster
+kind create cluster --name k8s
+
+# pra ver os clusters
+kubectl cluster-info --context kind-k8s
+
+# pra ver os clusters
+kind get clusters
+
+## antes de deployar a imagem adiciona ao kubernate
+kind load docker-image jb-oliveira/k8s:v3 --name=k8s
+
+# pra fazer o deploy    
+kubectl apply -f k8s/deployment.yml
+
+# pra ver os pods
+kubectl get pods
+
+# pra deletar o cluster
+kind delete cluster --name k8s
+
+
+### Criando os services 
+
+# cria o service e deploya  
+kubectl apply -f k8s/service.yml
+
+# Visualiza os services
+kubectl get svc
+
+# pra visualização local faz um portforward da porta local 8080 pra porta 80 do service do kubernetes 
+kubectl port-forward svc/goapp 8080:80

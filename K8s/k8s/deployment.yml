@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goapp
+  template:
+    metadata:
+      labels:
+        app: goapp
+    spec:
+      containers:
+        - name: goapp
+          image: jb-oliveira/k8s:v3
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "256m"
+          # startup probe
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 10
+          # liveness probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+          # readiness probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1

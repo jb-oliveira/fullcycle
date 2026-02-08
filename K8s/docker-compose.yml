@@ -1,0 +1,13 @@
+services:
+  goapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/bin
+    environment:
+      - APP_ENV=development
+    command: ["tail", "-f", "/dev/null"]
