@@ -13,10 +13,10 @@ func NewDatabase(cfg *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS PRODUCTS(
+		CREATE TABLE IF NOT EXISTS ORDERS(
 			ID VARCHAR(36) PRIMARY KEY,
-			NAME VARCHAR(255),
-			PRICE DECIMAL(10,2)
+			PRICE DECIMAL(10,2),
+			TAX DECIMAL(10,2)
 		);
 	`)
 	if err != nil {

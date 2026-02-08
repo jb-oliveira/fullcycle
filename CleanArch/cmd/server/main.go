@@ -47,8 +47,13 @@ func main() {
 
 	handler := NewWebOrderHandler(db, eventDispatcher)
 	webserver := webserver.NewWebServer(cfg.WebServerPort)
-	webserver.RegisterHandler("POST", "/orders", handler.CreateOrder)
-	go webserver.Start()
+	webserver.RegisterHandler(http.MethodPost, "/api/v1/orders", handler.CreateOrder)
+	fmt.Println("Starting web server on port", cfg.WebServerPort)
+	go func() {
+		if err := webserver.Start(); err != nil {
+			panic(err)
+		}
+	}()
 
 	grpcServer := grpc.NewServer()
 	createOrderService := service.NewOrderService(*uc)
