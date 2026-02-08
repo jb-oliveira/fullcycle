@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -54,13 +53,13 @@ func (r *OrderRepositoryPG) FindAll(page, limit int, sort, sortDir string) ([]en
 	// 1. Validar o sort para evitar SQL Injection (Importante!)
 	allowedSorts := map[string]bool{"id": true, "price": true, "tax": true}
 	if !allowedSorts[sort] {
-		return nil, errors.New("invalid sort")
+		sort = "id"
 	}
 
 	allowedSortDirs := map[string]bool{"ASC": true, "DESC": true}
 	direction := strings.ToUpper(sortDir)
 	if !allowedSortDirs[direction] {
-		return nil, errors.New("invalid sort direction")
+		direction = "ASC"
 	}
 
 	// 2. Calcular o offset corretamente
