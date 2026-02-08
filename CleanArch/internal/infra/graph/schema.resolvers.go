@@ -31,21 +31,31 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInp
 	}, nil
 }
 
+// Orders is the resolver for the orders field.
+func (r *queryResolver) Orders(ctx context.Context, page int32, limit int32, sort string, sortDir string) ([]*model.OrderOutput, error) {
+	newVar := int(page)
+	newVar1 := int(limit)
+	orders, err := r.ListOrdersUseCase.Execute(newVar, newVar1, sort, sortDir)
+	if err != nil {
+		return nil, err
+	}
+	var ordersOutput []*model.OrderOutput
+	for _, order := range orders {
+		ordersOutput = append(ordersOutput, &model.OrderOutput{
+			ID:         order.ID,
+			Price:      order.Price,
+			Tax:        order.Tax,
+			FinalPrice: order.CalculateFinalPrice(),
+		})
+	}
+	return ordersOutput, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) Orders(ctx context.Context) ([]*model.OrderOutput, error) {
-	panic(fmt.Errorf("not implemented: Orders - orders"))
-}
+// Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-*/

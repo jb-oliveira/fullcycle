@@ -25,11 +25,18 @@ func NewCreateOrderUseCase(db *sql.DB, eventDispatcher events.EventDispatcherInt
 	return createOrderUseCase
 }
 
+func NewListOrdersUseCase(db *sql.DB) *usecase.ListOrdersUseCase {
+	orderRepository := database.NewOrderRepositoryPG(db)
+	listOrdersUseCase := usecase.NewListOrdersUseCase(orderRepository)
+	return listOrdersUseCase
+}
+
 func NewWebOrderHandler(db *sql.DB, eventDispatcher events.EventDispatcherInterface) *web.OrderHandler {
 	orderRepository := database.NewOrderRepositoryPG(db)
 	orderCreated := event.NewOrderCreated()
 	createOrderUseCase := usecase.NewCreateOrderUseCase(orderRepository, orderCreated, eventDispatcher)
-	orderHandler := web.NewOrderHandler(createOrderUseCase)
+	listOrdersUseCase := usecase.NewListOrdersUseCase(orderRepository)
+	orderHandler := web.NewOrderHandler(createOrderUseCase, listOrdersUseCase)
 	return orderHandler
 }
 

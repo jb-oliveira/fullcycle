@@ -4,6 +4,12 @@
 
 ver READ.ME do projeto
 
+to generate the code 
+
+```bash
+protoc --go_out=. --go-grpc_out=. internal/infra/grpc/protofiles/order.proto
+```
+
 # GRAPHQL
 
 instalar o gqlgen:
@@ -35,3 +41,16 @@ resolver.go
 
 se der erro no "go run github.com/99designs/gqlgen generate"
 roda 
+
+
+```bash
+go get github.com/99designs/gqlgen/codegen/config@latest
+```
+
+```bash
+go get github.com/99designs/gqlgen@latest
+```
+
+```bash
+go run github.com/99designs/gqlgen generate
+```

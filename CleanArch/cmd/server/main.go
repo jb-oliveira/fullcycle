@@ -43,11 +43,13 @@ func main() {
 	eventDispatcher := events.NewEventDispatcher()
 	eventDispatcher.Register("OrderCreated", handler.NewOrderCreatedHandlerRabbitMQ(channel))
 
-	uc := NewCreateOrderUseCase(db, eventDispatcher)
+	createOrderUseCase := NewCreateOrderUseCase(db, eventDispatcher)
+	listOrdersUseCase := NewListOrdersUseCase(db)
 
 	handler := NewWebOrderHandler(db, eventDispatcher)
 	webserver := webserver.NewWebServer(cfg.WebServerPort)
 	webserver.RegisterHandler(http.MethodPost, "/api/v1/orders", handler.CreateOrder)
+	webserver.RegisterHandler(http.MethodGet, "/api/v1/orders", handler.ListOrders)
 	fmt.Println("Starting web server on port", cfg.WebServerPort)
 	go func() {
 		if err := webserver.Start(); err != nil {
@@ -56,8 +58,8 @@ func main() {
 	}()
 
 	grpcServer := grpc.NewServer()
-	createOrderService := service.NewOrderService(*uc)
-	pb.RegisterOrderServiceServer(grpcServer, createOrderService)
+	orderService := service.NewOrderService(*createOrderUseCase, *listOrdersUseCase)
+	pb.RegisterOrderServiceServer(grpcServer, orderService)
 	// This line is only necessary for evans
 	reflection.Register(grpcServer)
 
@@ -69,7 +71,8 @@ func main() {
 	go grpcServer.Serve(lis)
 
 	srv := graphql_handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		CreateOrderUseCase: *uc,
+		CreateOrderUseCase: *createOrderUseCase,
+		ListOrdersUseCase:  *listOrdersUseCase,
 	}}))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

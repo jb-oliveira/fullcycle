@@ -10,7 +10,18 @@ message CreateOrderRequest {
 	double tax = 3;
 }
 
-message CreateOrderResponse {
+message ListOrdersRequest {
+	int32 page = 1;
+	int32 limit = 2;
+	string sort = 3;
+	string sort_dir = 4;
+}
+
+message ListOrdersResponse {
+	repeated Order orders = 1;
+}
+
+message Order {
 	string id = 1;
 	double price = 2;
 	double tax = 3;
@@ -18,5 +29,6 @@ message CreateOrderResponse {
 }
 
 service OrderService {
-	rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+	rpc CreateOrder (CreateOrderRequest) returns (Order);
+	rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
 }

@@ -40,6 +40,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -58,11 +59,15 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Orders func(childComplexity int, page int32, limit int32, sort string, sortDir string) int
 	}
 }
 
 type MutationResolver interface {
 	CreateOrder(ctx context.Context, input model.OrderInput) (*model.OrderOutput, error)
+}
+type QueryResolver interface {
+	Orders(ctx context.Context, page int32, limit int32, sort string, sortDir string) ([]*model.OrderOutput, error)
 }
 
 type executableSchema struct {
@@ -120,6 +125,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.OrderOutput.Tax(childComplexity), true
+
+	case "Query.orders":
+		if e.complexity.Query.Orders == nil {
+			break
+		}
+
+		args, err := ec.field_Query_orders_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Orders(childComplexity, args["page"].(int32), args["limit"].(int32), args["sort"].(string), args["sortDir"].(string)), true
 
 	}
 	return 0, false
@@ -265,6 +282,32 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_orders_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "page", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["page"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "sort", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["sort"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "sortDir", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["sortDir"] = arg3
 	return args, nil
 }
 
@@ -483,6 +526,57 @@ func (ec *executionContext) fieldContext_OrderOutput_finalPrice(_ context.Contex
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_orders(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_orders,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Orders(ctx, fc.Args["page"].(int32), fc.Args["limit"].(int32), fc.Args["sort"].(string), fc.Args["sortDir"].(string))
+		},
+		nil,
+		ec.marshalNOrderOutput2ᚕᚖgithubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderOutputᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_orders(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_OrderOutput_id(ctx, field)
+			case "price":
+				return ec.fieldContext_OrderOutput_price(ctx, field)
+			case "tax":
+				return ec.fieldContext_OrderOutput_tax(ctx, field)
+			case "finalPrice":
+				return ec.fieldContext_OrderOutput_finalPrice(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OrderOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_orders_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2212,6 +2306,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "orders":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_orders(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -2626,6 +2742,22 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
+	res, err := graphql.UnmarshalInt32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalInt32(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNOrderInput2githubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderInput(ctx context.Context, v any) (model.OrderInput, error) {
 	res, err := ec.unmarshalInputOrderInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2633,6 +2765,50 @@ func (ec *executionContext) unmarshalNOrderInput2githubᚗcomᚋjbᚑoliveiraᚋ
 
 func (ec *executionContext) marshalNOrderOutput2githubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderOutput(ctx context.Context, sel ast.SelectionSet, v model.OrderOutput) graphql.Marshaler {
 	return ec._OrderOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrderOutput2ᚕᚖgithubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderOutputᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.OrderOutput) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrderOutput2ᚖgithubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderOutput(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNOrderOutput2ᚖgithubᚗcomᚋjbᚑoliveiraᚋfullcycleᚋCleanArchᚋinternalᚋinfraᚋgraphᚋmodelᚐOrderOutput(ctx context.Context, sel ast.SelectionSet, v *model.OrderOutput) graphql.Marshaler {

@@ -11,10 +11,14 @@ input OrderInput { # CHANGED: type to input
   tax: Float!
 }
 
-# type Query {
-#   # You need at least one query to make the schema valid
-#   orders: [OrderOutput!]!
-# }
+type Query {
+  orders(
+    page: Int!
+    limit: Int!
+    sort: String!
+    sortDir: String!
+  ): [OrderOutput!]!
+}
 
 type Mutation {
   createOrder(input: OrderInput!): OrderOutput!

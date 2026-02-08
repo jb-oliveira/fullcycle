@@ -9,4 +9,5 @@ import "github.com/jb-oliveira/fullcycle/CleanArch/internal/usecase"
 
 type Resolver struct {
 	CreateOrderUseCase usecase.CreateOrderUseCase
+	ListOrdersUseCase  usecase.ListOrdersUseCase
 }
