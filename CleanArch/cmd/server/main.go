@@ -58,6 +58,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	createOrderService := service.NewOrderService(*uc)
 	pb.RegisterOrderServiceServer(grpcServer, createOrderService)
+	// This line is only necessary for evans
 	reflection.Register(grpcServer)
 
 	fmt.Println("Starting gRPC server on port", cfg.GrpcServerPort)
